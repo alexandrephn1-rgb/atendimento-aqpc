@@ -185,6 +185,7 @@
        </select>
        <button id="btn-filtrar" class="btn" style="margin-top:10px;">Filtrar</button>
        <button id="btn-voltar-atendimento" class="btn" style="background:#bdbdbd;color:#222;margin-top:10px;">Voltar ao Atendimento</button>
+       <button id="btn-sair-pesquisa" class="btn" style="background:#bdbdbd;color:#222;margin-top:10px;">Sair</button>
        <div id="resultados-pesquisa" style="margin-top:18px;"></div>
      </div>
      <!-- Fim tela de pesquisa -->
@@ -215,7 +216,8 @@
        <button id="btn-voltar-aguarde" class="btn" style="background:#bdbdbd;color:#222;max-width:200px;margin:0 auto;display:block;">Voltar ao Login</button>
        <div id="aguarde-timer" style="text-align:center;font-size:0.98rem;color:#888;margin-top:8px;"></div>
      </div>
-     <form id="formulario" class="hidden">
+  <button id="btn-sair-form" class="btn" style="background:#bdbdbd;color:#222;display:none;margin-bottom:10px;">Sair</button>
+  <form id="formulario" class="hidden">
       <label for="local">Local de Atendimento</label>
       <select id="local" required>
         <option value="">Selecione...</option>
@@ -235,10 +237,11 @@
       <textarea id="aqpc" placeholder="Descreva a ação tomada..." required></textarea>
       <button type="submit" class="btn">Finalizar Atendimento</button>
     </form>
-    <div id="resultado" class="card hidden"></div>
+  <div id="resultado" class="card hidden"></div>
     <button id="btn-pesquisar" class="btn hidden" style="margin-top:18px;">Pesquisar Atendimentos</button>
     <!-- Tela de aprovação para admin -->
-     <div id="tela-admin" class="hidden card">
+  <div id="tela-admin" class="hidden card">
+   <button id="btn-sair-admin" class="btn" style="background:#bdbdbd;color:#222;margin-bottom:10px;">Sair</button>
       <h3 style="color:var(--primary);text-align:center;margin-bottom:18px;">Solicitações de Cadastro</h3>
       <div id="lista-solicitacoes"></div>
         <div class="admin-approvals-bar">
@@ -315,6 +318,19 @@
       await db.collection('usuarios').add({
         nome, usuario, senha, aprovado: false, admin: false
       });
+        .admin-approvals-bar {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+          margin-top: 18px;
+          justify-content: center;
+        }
+        .btn-admin-approvals {
+          flex: 1 1 120px;
+          min-width: 120px;
+          max-width: 200px;
+          margin: 0 0 0 0;
+        }
     }
 
     async function buscarSolicitacoesPendentes() {
@@ -355,7 +371,6 @@
       if (user === 'Alexandre' && pass === '1010') {
         usuarioLogado = { usuario: 'Alexandre', admin: true, aprovado: true };
         mostrarTelaAdmin();
-        adminBar.classList.remove('hidden');
         return;
       }
       const u = await buscarUsuario(user, pass);
@@ -369,7 +384,6 @@
       }
       usuarioLogado = u;
       mostrarTelaAtendimento();
-      if (u.admin) adminBar.classList.remove('hidden');
     };
 
     btnMostrarCadastro.onclick = function() {
@@ -408,8 +422,8 @@
       btnPesquisar.classList.add('hidden');
       telaAdmin.classList.add('hidden');
       telaPesquisa.style.display = 'none';
-      aguardeTimer.textContent = "Voltando ao login em 10s...";
-      let segundos = 10;
+      aguardeTimer.textContent = "Voltando ao login em 3s...";
+      let segundos = 3;
       if (aguardeTimeout) clearInterval(aguardeTimeout);
       aguardeTimeout = setInterval(() => {
         segundos--;
@@ -434,13 +448,12 @@
       telaLogin.classList.add('hidden');
       telaCadastro.classList.add('hidden');
       telaAguarde.classList.add('hidden');
-      form.classList.remove('hidden');
-      btnPesquisar.classList.remove('hidden');
       telaAdmin.classList.add('hidden');
       telaPesquisa.style.display = 'none';
+      form.classList.remove('hidden');
+      btnPesquisar.classList.remove('hidden');
       resultado.classList.add('hidden');
       form.reset();
-      // Sempre mostrar barra admin para admin
       if (usuarioLogado && usuarioLogado.admin) {
         adminBar.classList.remove('hidden');
       } else {
@@ -454,8 +467,9 @@
       telaAguarde.classList.add('hidden');
       form.classList.add('hidden');
       btnPesquisar.classList.add('hidden');
-      telaAdmin.classList.remove('hidden');
       telaPesquisa.style.display = 'none';
+      resultado.classList.add('hidden');
+      telaAdmin.classList.remove('hidden');
       adminBar.classList.remove('hidden');
       carregarSolicitacoes();
     }
@@ -481,12 +495,12 @@
     };
     // Navegação admin-bar
     if (btnIrFormularioBar) btnIrFormularioBar.onclick = function() {
-      telaAdmin.classList.add('hidden');
-      telaPesquisa.style.display = 'none';
-      resultado.classList.add('hidden');
       mostrarTelaAtendimento();
     };
     if (btnIrPesquisaBar) btnIrPesquisaBar.onclick = function() {
+      telaLogin.classList.add('hidden');
+      telaCadastro.classList.add('hidden');
+      telaAguarde.classList.add('hidden');
       telaAdmin.classList.add('hidden');
       form.classList.add('hidden');
       resultado.classList.add('hidden');
@@ -495,22 +509,25 @@
       adminBar.classList.remove('hidden');
       buscarAtendimentos().then(mostrarResultados);
     };
+    btnAprovacoes.onclick = function() {
+      mostrarTelaAdmin();
+    };
     btnVoltarApp.onclick = function() {
-      telaAdmin.classList.add('hidden');
       mostrarTelaAtendimento();
     };
     btnIrFormulario.onclick = function() {
-      telaAdmin.classList.add('hidden');
       mostrarTelaAtendimento();
     };
     btnIrPesquisa.onclick = function() {
+      telaLogin.classList.add('hidden');
+      telaCadastro.classList.add('hidden');
+      telaAguarde.classList.add('hidden');
       telaAdmin.classList.add('hidden');
       form.classList.add('hidden');
       resultado.classList.add('hidden');
       telaPesquisa.style.display = 'block';
       btnPesquisar.classList.remove('hidden');
       adminBar.classList.remove('hidden');
-      // Carrega todos os atendimentos ao abrir pesquisa
       buscarAtendimentos().then(mostrarResultados);
     };
     btnSairAdminBar.onclick = function() {
@@ -562,14 +579,15 @@
         usuario: usuarioLogado ? usuarioLogado.usuario : ''
       };
       await salvarAtendimento(atendimento);
-      // Mostra resultado
-      resultado.innerHTML = `
-        <strong>Atendimento finalizado!</strong><br><br>
-        <b>Pessoa:</b> ${pessoa}<br>
-        <b>Tempo gasto:</b> ${tempoGasto}
-      `;
-      resultado.classList.remove('hidden');
+      // Mostra resultado na tela de pesquisa
+      telaPesquisa.style.display = 'block';
       form.classList.add('hidden');
+      btnPesquisar.classList.remove('hidden');
+      adminBar.classList.remove('hidden');
+      telaAdmin.classList.add('hidden');
+      resultado.classList.add('hidden');
+      // Mostra o atendimento recém cadastrado no topo
+      mostrarResultados([atendimento]);
     });
 
     // Botão para mostrar tela de pesquisa
@@ -584,8 +602,28 @@
     // Botão voltar ao atendimento
     btnVoltarAtendimento.onclick = function() {
       telaPesquisa.style.display = 'none';
-      form.style.display = '';
+      form.classList.remove('hidden');
+      resultado.classList.add('hidden');
+      form.reset();
+      btnPesquisar.classList.remove('hidden');
+      adminBar.classList.remove('hidden');
     };
+    // Botão sair em todas as telas (menos login)
+    document.getElementById('btn-sair-form').onclick = sairApp;
+    document.getElementById('btn-sair-pesquisa').onclick = sairApp;
+    document.getElementById('btn-sair-admin').onclick = sairApp;
+    function sairApp() {
+      usuarioLogado = null;
+      telaLogin.classList.remove('hidden');
+      telaCadastro.classList.add('hidden');
+      telaAguarde.classList.add('hidden');
+      form.classList.add('hidden');
+      btnPesquisar.classList.add('hidden');
+      telaAdmin.classList.add('hidden');
+      telaPesquisa.style.display = 'none';
+      resultado.classList.add('hidden');
+      adminBar.classList.add('hidden');
+    }
 
     // Filtrar atendimentos
     btnFiltrar.onclick = async function() {
@@ -623,6 +661,7 @@
       telaAdmin.classList.add('hidden');
       telaPesquisa.style.display = 'none';
       adminBar.classList.add('hidden');
+      document.getElementById('btn-sair-form').style.display = 'block';
     };
   </script>
 </body>

@@ -183,8 +183,8 @@
          <option>Usinagem Bloco</option>
          <option>Usinagem Cabeçote</option>
        </select>
-  <button id="btn-filtrar" class="btn" style="margin-top:10px;">Filtrar</button>
-  <button id="btn-sair-pesquisa" class="btn" style="background:#bdbdbd;color:#222;margin-top:10px;">Sair</button>
+       <button id="btn-filtrar" class="btn" style="margin-top:10px;">Filtrar</button>
+       <button id="btn-sair-pesquisa" class="btn" style="background:#bdbdbd;color:#222;margin-top:10px;">Sair</button>
        <div id="resultados-pesquisa" style="margin-top:18px;"></div>
      </div>
      <!-- Fim tela de pesquisa -->
@@ -269,7 +269,6 @@
   const resultado = document.getElementById('resultado');
   const btnPesquisar = document.getElementById('btn-pesquisar');
   const telaPesquisa = document.getElementById('tela-pesquisa');
-  const btnVoltarAtendimento = document.getElementById('btn-voltar-atendimento');
   const btnFiltrar = document.getElementById('btn-filtrar');
   const resultadosPesquisa = document.getElementById('resultados-pesquisa');
   const telaLogin = document.getElementById('tela-login');
@@ -585,7 +584,6 @@
       mostrarResultados(lista);
     };
 
-  // Removido botão voltar ao atendimento da tela de pesquisa
     // Botão sair em todas as telas (menos login)
     document.getElementById('btn-sair-form').onclick = sairApp;
     document.getElementById('btn-sair-pesquisa').onclick = sairApp;

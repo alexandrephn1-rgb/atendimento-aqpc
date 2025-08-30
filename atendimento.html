@@ -138,9 +138,24 @@
       animation: fadeIn 0.7s;
     }
     .hidden { display: none !important; }
+    .admin-approvals-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+      justify-content: center;
+    }
+    .btn-admin-approvals {
+      flex: 1 1 120px;
+      min-width: 120px;
+      max-width: 200px;
+      margin: 0;
+    }
     @media (max-width: 600px) {
       .container { padding: 18px 4vw 18px 4vw; }
       h2 { font-size: 1.2rem; }
+      .admin-approvals-bar { flex-direction: column; gap: 8px; }
+      .btn-admin-approvals { max-width: 100%; min-width: 0; }
     }
   </style>
 </head>
@@ -149,8 +164,12 @@
      <h2>Atendimento de Linha - ALD4</h2>
      <div id="admin-bar" class="admin-bar hidden">
        <span>Administrador: Alexandre</span>
-       <button id="btn-aprovacoes" class="btn-admin">Aprovar Usuários</button>
-       <button id="btn-sair-admin-bar" class="btn-admin" style="background:#bdbdbd;color:#222;">Sair</button>
+       <div style="display:flex;gap:8px;flex-wrap:wrap;">
+         <button id="btn-ir-formulario-bar" class="btn-admin" title="Formulário">Formulário</button>
+         <button id="btn-ir-pesquisa-bar" class="btn-admin" title="Pesquisar">Pesquisar</button>
+         <button id="btn-aprovacoes" class="btn-admin" title="Aprovar Usuários">Aprovações</button>
+         <button id="btn-sair-admin-bar" class="btn-admin" style="background:#bdbdbd;color:#222;">Sair</button>
+       </div>
      </div>
      <!-- Tela de pesquisa -->
      <div id="tela-pesquisa" style="display:none;">
@@ -218,11 +237,11 @@
      <div id="tela-admin" class="hidden card">
       <h3 style="color:var(--primary);text-align:center;margin-bottom:18px;">Solicitações de Cadastro</h3>
       <div id="lista-solicitacoes"></div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;">
-        <button id="btn-voltar-app" class="btn" style="background:#bdbdbd;color:#222;flex:1;">Voltar para o App</button>
-        <button id="btn-ir-formulario" class="btn" style="flex:1;">Formulário</button>
-        <button id="btn-ir-pesquisa" class="btn" style="flex:1;">Pesquisar</button>
-      </div>
+        <div class="admin-approvals-bar">
+          <button id="btn-voltar-app" class="btn btn-admin-approvals" style="background:#bdbdbd;color:#222;">Voltar para o App</button>
+          <button id="btn-ir-formulario" class="btn btn-admin-approvals">Formulário</button>
+          <button id="btn-ir-pesquisa" class="btn btn-admin-approvals">Pesquisar</button>
+        </div>
     </div>
   </div>
   <script>
@@ -239,23 +258,23 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Elementos
-    const form = document.getElementById('formulario');
-    const resultado = document.getElementById('resultado');
-    const btnPesquisar = document.getElementById('btn-pesquisar');
-    const telaPesquisa = document.getElementById('tela-pesquisa');
-    const btnVoltarAtendimento = document.getElementById('btn-voltar-atendimento');
-    const btnFiltrar = document.getElementById('btn-filtrar');
-    const resultadosPesquisa = document.getElementById('resultados-pesquisa');
-    const telaLogin = document.getElementById('tela-login');
-    const telaCadastro = document.getElementById('tela-cadastro');
+  // Elementos
+  const form = document.getElementById('formulario');
+  const resultado = document.getElementById('resultado');
+  const btnPesquisar = document.getElementById('btn-pesquisar');
+  const telaPesquisa = document.getElementById('tela-pesquisa');
+  const btnVoltarAtendimento = document.getElementById('btn-voltar-atendimento');
+  const btnFiltrar = document.getElementById('btn-filtrar');
+  const resultadosPesquisa = document.getElementById('resultados-pesquisa');
+  const telaLogin = document.getElementById('tela-login');
+  const telaCadastro = document.getElementById('tela-cadastro');
   const telaAguarde = document.getElementById('tela-aguarde');
   const btnVoltarAguarde = document.getElementById('btn-voltar-aguarde');
   const aguardeTimer = document.getElementById('aguarde-timer');
-    const btnLogin = document.getElementById('btn-login');
-    const btnMostrarCadastro = document.getElementById('btn-mostrar-cadastro');
-    const btnCadastrar = document.getElementById('btn-cadastrar');
-    const btnVoltarLogin = document.getElementById('btn-voltar-login');
+  const btnLogin = document.getElementById('btn-login');
+  const btnMostrarCadastro = document.getElementById('btn-mostrar-cadastro');
+  const btnCadastrar = document.getElementById('btn-cadastrar');
+  const btnVoltarLogin = document.getElementById('btn-voltar-login');
   const telaAdmin = document.getElementById('tela-admin');
   const listaSolicitacoes = document.getElementById('lista-solicitacoes');
   const adminBar = document.getElementById('admin-bar');
@@ -264,6 +283,9 @@
   const btnVoltarApp = document.getElementById('btn-voltar-app');
   const btnIrFormulario = document.getElementById('btn-ir-formulario');
   const btnIrPesquisa = document.getElementById('btn-ir-pesquisa');
+  // Novos botões de navegação na barra admin
+  const btnIrFormularioBar = document.getElementById('btn-ir-formulario-bar');
+  const btnIrPesquisaBar = document.getElementById('btn-ir-pesquisa-bar');
 
     let usuarioLogado = null;
 
@@ -289,6 +311,19 @@
       await db.collection('usuarios').add({
         nome, usuario, senha, aprovado: false, admin: false
       });
+        .admin-approvals-bar {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+          margin-top: 18px;
+          justify-content: center;
+        }
+        .btn-admin-approvals {
+          flex: 1 1 120px;
+          min-width: 120px;
+          max-width: 200px;
+          margin: 0 0 0 0;
+        }
     }
 
     async function buscarSolicitacoesPendentes() {
@@ -451,6 +486,22 @@
 
     btnAprovacoes.onclick = function() {
       mostrarTelaAdmin();
+    };
+    // Navegação admin-bar
+    if (btnIrFormularioBar) btnIrFormularioBar.onclick = function() {
+      telaAdmin.classList.add('hidden');
+      telaPesquisa.style.display = 'none';
+      resultado.classList.add('hidden');
+      mostrarTelaAtendimento();
+    };
+    if (btnIrPesquisaBar) btnIrPesquisaBar.onclick = function() {
+      telaAdmin.classList.add('hidden');
+      form.classList.add('hidden');
+      resultado.classList.add('hidden');
+      telaPesquisa.style.display = 'block';
+      btnPesquisar.classList.remove('hidden');
+      adminBar.classList.remove('hidden');
+      buscarAtendimentos().then(mostrarResultados);
     };
     btnVoltarApp.onclick = function() {
       telaAdmin.classList.add('hidden');

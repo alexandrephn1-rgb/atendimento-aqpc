@@ -225,8 +225,8 @@
       </select>
       <label for="pessoa">Pessoa que realizou o atendimento</label>
       <input type="text" id="pessoa" required placeholder="Nome do responsável">
-      <label for="inicio">Horário de Início</label>
-      <input type="time" id="inicio" required>
+  <label for="data-atendimento">Data do Atendimento</label>
+  <input type="date" id="data-atendimento" required>
       <label for="hora-atendimento">Hora do Atendimento</label>
       <input type="time" id="hora-atendimento" required>
       <label for="problema">Descrição do Problema</label>
@@ -531,37 +531,22 @@
       // Pega os campos
       const local = document.getElementById('local').value;
       const pessoa = document.getElementById('pessoa').value;
-      const inicio = document.getElementById('inicio').value;
+  const dataAtendimento = document.getElementById('data-atendimento').value;
       const horaAtendimento = document.getElementById('hora-atendimento').value;
       const problema = document.getElementById('problema').value;
       const acao = document.getElementById('aqpc').value;
-      if (!local || !pessoa || !inicio || !horaAtendimento || !problema || !acao) {
+      if (!local || !pessoa || !dataAtendimento || !horaAtendimento || !problema || !acao) {
         alert('Preencha todos os campos!');
         return;
       }
-      // Calcular tempo gasto
-      const [h1, m1] = inicio.split(':');
-      const [h2, m2] = horaAtendimento.split(':');
-      let inicioDate = new Date();
-      inicioDate.setHours(Number(h1), Number(m1), 0, 0);
-      let fimDate = new Date();
-      fimDate.setHours(Number(h2), Number(m2), 0, 0);
-      let diff = (fimDate - inicioDate) / 1000;
-      if (diff < 0) diff += 24 * 3600;
-      const horas = Math.floor(diff / 3600);
-      const minutos = Math.floor((diff % 3600) / 60);
-      const segundos = Math.floor(diff % 60);
-      const tempoGasto = `${horas}h ${minutos}m ${segundos}s`;
       // Salva atendimento
       const atendimento = {
-        data: new Date().toISOString().slice(0,10),
+        data: dataAtendimento,
         local,
         pessoa,
-        inicio,
         horaAtendimento,
         problema,
         acao,
-        tempo: tempoGasto,
         usuario: usuarioLogado ? usuarioLogado.usuario : ''
       };
       await salvarAtendimento(atendimento);
@@ -623,7 +608,7 @@
         <div style="border:1px solid #ccc;border-radius:8px;padding:10px;margin-bottom:10px;">
           <b>Data:</b> ${a.data}<br>
           <b>Departamento:</b> ${a.local}<br>
-          <b>Início:</b> ${a.inicio}<br>
+          <b>Data do Atendimento:</b> ${a.data}<br>
           <b>Descrição do Problema:</b> ${a.problema}<br>
           <b>Ação Tomada:</b> ${a.acao}<br>
           <b>Tempo:</b> ${a.tempo}<br>

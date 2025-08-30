@@ -182,6 +182,7 @@
          <option>Linha de montagem</option>
          <option>Usinagem Bloco</option>
          <option>Usinagem Cabeçote</option>
+         <option>MVA S10</option>
        </select>
        <button id="btn-filtrar" class="btn" style="margin-top:10px;">Filtrar</button>
        <button id="btn-voltar-login-pesquisa" class="btn" style="background:#bdbdbd;color:#222;margin-top:10px;">Sair</button>
@@ -191,19 +192,22 @@
      <!-- Tela de login/cadastro -->
      <div id="tela-login">
        <h3>Login</h3>
-       <label for="login-user">Usuário</label>
+       <label for="login-user">Inspetor de Qualidade</label>
        <input type="text" id="login-user" required autocomplete="username">
        <label for="login-pass">Senha</label>
        <input type="password" id="login-pass" required autocomplete="current-password">
        <button id="btn-login" class="btn">Entrar</button>
-       <div style="text-align:center;margin:10px 0;">ou</div>
+       <div style="text-align:center;margin:10px 0;">
+         ou
+         <button id="btn-recuperar-senha" class="btn" style="background:#ffd600;color:#222;margin-top:8px;">Esqueci minha senha</button>
+       </div>
        <button id="btn-mostrar-cadastro" class="btn" style="background:#bdbdbd;color:#222;">Cadastrar Novo Usuário</button>
      </div>
      <div id="tela-cadastro" class="hidden">
        <h3>Cadastro de Novo Usuário</h3>
        <label for="cad-nome">Nome</label>
        <input type="text" id="cad-nome" required>
-       <label for="cad-user">Usuário</label>
+       <label for="cad-user">Inspetor de Qualidade</label>
        <input type="text" id="cad-user" required>
        <label for="cad-pass">Senha</label>
        <input type="password" id="cad-pass" required>
@@ -222,6 +226,7 @@
         <option>Linha de montagem</option>
         <option>Usinagem Bloco</option>
         <option>Usinagem Cabeçote</option>
+        <option>MVA S10</option>
       </select>
       <label for="pessoa">Pessoa que realizou o atendimento</label>
       <input type="text" id="pessoa" required placeholder="Nome do responsável">
@@ -248,6 +253,18 @@
         </div>
     </div>
   </div>
+  <div id="tela-recuperar-senha" class="hidden card">
+       <h3>Recuperar/Criar Nova Senha</h3>
+       <label for="recupera-user">Inspetor de Qualidade</label>
+       <input type="text" id="recupera-user" required>
+       <label for="recupera-nome">Nome</label>
+       <input type="text" id="recupera-nome" required>
+       <label for="recupera-nova-senha">Nova Senha</label>
+       <input type="password" id="recupera-nova-senha" required>
+       <button id="btn-confirmar-recupera" class="btn">Salvar Nova Senha</button>
+       <button id="btn-voltar-login-recupera" class="btn" style="background:#bdbdbd;color:#222;">Voltar ao Login</button>
+       <div id="recupera-msg" style="margin-top:10px;color:#d32f2f;"></div>
+     </div>
   <script>
     // Firebase config (mesmo projeto do site.html)
     const firebaseConfig = {
@@ -290,6 +307,11 @@
   // Novos botões de navegação na barra admin
   const btnIrFormularioBar = document.getElementById('btn-ir-formulario-bar');
   const btnIrPesquisaBar = document.getElementById('btn-ir-pesquisa-bar');
+  const telaRecuperarSenha = document.getElementById('tela-recuperar-senha');
+  const btnRecuperarSenha = document.getElementById('btn-recuperar-senha');
+  const btnConfirmarRecupera = document.getElementById('btn-confirmar-recupera');
+  const btnVoltarLoginRecupera = document.getElementById('btn-voltar-login-recupera');
+  const recuperaMsg = document.getElementById('recupera-msg');
 
     let usuarioLogado = null;
 
@@ -348,7 +370,7 @@
       const user = document.getElementById('login-user').value.trim();
       const pass = document.getElementById('login-pass').value.trim();
       if (!user || !pass) {
-        alert('Preencha usuário e senha!');
+        alert('Preencha Inspetor de Qualidade e senha!');
         return;
       }
       // Admin fixo: Alexandre/1010
@@ -359,7 +381,7 @@
       }
       const u = await buscarUsuario(user, pass);
       if (!u) {
-        alert('Usuário ou senha incorretos!');
+        alert('Inspetor de Qualidade ou senha incorretos!');
         return;
       }
       if (!u.aprovado) {
@@ -447,8 +469,8 @@
       } else {
         adminBar.classList.add('hidden');
       }
+      form.style.display = 'block';
     }
-
     function mostrarTelaAdmin() {
       telaLogin.classList.add('hidden');
       telaCadastro.classList.add('hidden');
@@ -629,6 +651,44 @@
       adminBar.classList.add('hidden');
       document.getElementById('btn-sair-form').style.display = 'block';
     };
+    if (btnRecuperarSenha) btnRecuperarSenha.onclick = function() {
+    telaLogin.classList.add('hidden');
+    telaRecuperarSenha.classList.remove('hidden');
+    recuperaMsg.textContent = '';
+  };
+  if (btnVoltarLoginRecupera) btnVoltarLoginRecupera.onclick = function() {
+    telaRecuperarSenha.classList.add('hidden');
+    telaLogin.classList.remove('hidden');
+    recuperaMsg.textContent = '';
+  };
+  if (btnConfirmarRecupera) btnConfirmarRecupera.onclick = async function() {
+    const user = document.getElementById('recupera-user').value.trim();
+    const nome = document.getElementById('recupera-nome').value.trim();
+    const novaSenha = document.getElementById('recupera-nova-senha').value.trim();
+    if (!user || !nome || !novaSenha) {
+      recuperaMsg.textContent = 'Preencha todos os campos!';
+      return;
+    }
+    const snap = await db.collection('usuarios')
+      .where('usuario', '==', user)
+      .where('nome', '==', nome)
+      .where('aprovado', '==', true)
+      .get();
+    if (snap.empty) {
+      recuperaMsg.textContent = 'Usuário não encontrado ou não aprovado.';
+      return;
+    }
+    const id = snap.docs[0].id;
+    await db.collection('usuarios').doc(id).update({ senha: novaSenha });
+    recuperaMsg.style.color = '#43a047';
+    recuperaMsg.textContent = 'Senha atualizada com sucesso!';
+    setTimeout(() => {
+      telaRecuperarSenha.classList.add('hidden');
+      telaLogin.classList.remove('hidden');
+      recuperaMsg.textContent = '';
+      recuperaMsg.style.color = '#d32f2f';
+    }, 2000);
+  };
   </script>
 </body>
 </html>

@@ -184,7 +184,7 @@
          <option>Usinagem Cabeçote</option>
        </select>
        <button id="btn-filtrar" class="btn" style="margin-top:10px;">Filtrar</button>
-       <button id="btn-sair-pesquisa" class="btn" style="background:#bdbdbd;color:#222;margin-top:10px;">Sair</button>
+       <button id="btn-voltar-login-pesquisa" class="btn" style="background:#bdbdbd;color:#222;margin-top:10px;">Sair</button>
        <div id="resultados-pesquisa" style="margin-top:18px;"></div>
      </div>
      <!-- Fim tela de pesquisa -->
@@ -244,7 +244,7 @@
       <h3 style="color:var(--primary);text-align:center;margin-bottom:18px;">Solicitações de Cadastro</h3>
       <div id="lista-solicitacoes"></div>
         <div class="admin-approvals-bar">
-          <button id="btn-voltar-app" class="btn btn-admin-approvals" style="background:#bdbdbd;color:#222;">Voltar para o App</button>
+          <button id="btn-sair-app-admin" class="btn btn-admin-approvals" style="background:#bdbdbd;color:#222;">Sair</button>
           <button id="btn-ir-formulario" class="btn btn-admin-approvals">Formulário</button>
           <button id="btn-ir-pesquisa" class="btn btn-admin-approvals">Pesquisar</button>
         </div>
@@ -271,6 +271,7 @@
   const telaPesquisa = document.getElementById('tela-pesquisa');
   const btnFiltrar = document.getElementById('btn-filtrar');
   const resultadosPesquisa = document.getElementById('resultados-pesquisa');
+  const btnVoltarLoginPesquisa = document.getElementById('btn-voltar-login-pesquisa');
   const telaLogin = document.getElementById('tela-login');
   const telaCadastro = document.getElementById('tela-cadastro');
   const telaAguarde = document.getElementById('tela-aguarde');
@@ -285,7 +286,7 @@
   const adminBar = document.getElementById('admin-bar');
   const btnAprovacoes = document.getElementById('btn-aprovacoes');
   const btnSairAdminBar = document.getElementById('btn-sair-admin-bar');
-  const btnVoltarApp = document.getElementById('btn-voltar-app');
+  const btnSairAppAdmin = document.getElementById('btn-sair-app-admin');
   const btnIrFormulario = document.getElementById('btn-ir-formulario');
   const btnIrPesquisa = document.getElementById('btn-ir-pesquisa');
   // Novos botões de navegação na barra admin
@@ -497,9 +498,7 @@
     btnAprovacoes.onclick = function() {
       mostrarTelaAdmin();
     };
-    btnVoltarApp.onclick = function() {
-      mostrarTelaAtendimento();
-    };
+    if (btnSairAppAdmin) btnSairAppAdmin.onclick = sairApp;
     btnIrFormulario.onclick = function() {
       mostrarTelaAtendimento();
     };
@@ -586,8 +585,8 @@
 
     // Botão sair em todas as telas (menos login)
     document.getElementById('btn-sair-form').onclick = sairApp;
-    document.getElementById('btn-sair-pesquisa').onclick = sairApp;
     document.getElementById('btn-sair-admin').onclick = sairApp;
+    if (btnVoltarLoginPesquisa) btnVoltarLoginPesquisa.onclick = sairApp;
     function sairApp() {
       usuarioLogado = null;
       telaLogin.classList.remove('hidden');
@@ -636,9 +635,4 @@
       btnPesquisar.classList.add('hidden');
       telaAdmin.classList.add('hidden');
       telaPesquisa.style.display = 'none';
-      adminBar.classList.add('hidden');
-      document.getElementById('btn-sair-form').style.display = 'block';
-    };
-  </script>
-</body>
-</html>
+     

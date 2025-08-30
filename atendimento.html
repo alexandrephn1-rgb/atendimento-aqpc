@@ -223,8 +223,12 @@
         <option>Usinagem Bloco</option>
         <option>Usinagem Cabeçote</option>
       </select>
+      <label for="pessoa">Pessoa que realizou o atendimento</label>
+      <input type="text" id="pessoa" required placeholder="Nome do responsável">
       <label for="inicio">Horário de Início</label>
       <input type="time" id="inicio" required>
+      <label for="hora-atendimento">Hora do Atendimento</label>
+      <input type="time" id="hora-atendimento" required>
       <label for="problema">Descrição do Problema</label>
       <textarea id="problema" required placeholder="Descreva o problema..."></textarea>
       <label for="aqpc">Ação Tomada</label>
@@ -363,7 +367,15 @@
       // Admin fixo
       if (user === 'Alexandre' && pass === '1010') {
         usuarioLogado = { usuario: 'Alexandre', admin: true, aprovado: true };
-        mostrarTelaAtendimento();
+        telaLogin.classList.add('hidden');
+        telaCadastro.classList.add('hidden');
+        telaAguarde.classList.add('hidden');
+        form.classList.remove('hidden');
+        btnPesquisar.classList.remove('hidden');
+        telaAdmin.classList.add('hidden');
+        telaPesquisa.style.display = 'none';
+        resultado.classList.add('hidden');
+        form.reset();
         adminBar.classList.remove('hidden');
         return;
       }
@@ -533,37 +545,48 @@
     // Submissão do atendimento
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
-      // Pega o horário de início
+      // Pega os campos
+      const local = document.getElementById('local').value;
+      const pessoa = document.getElementById('pessoa').value;
       const inicio = document.getElementById('inicio').value;
-      if (!inicio) {
-        alert('Informe o horário de início!');
+      const horaAtendimento = document.getElementById('hora-atendimento').value;
+      const problema = document.getElementById('problema').value;
+      const acao = document.getElementById('aqpc').value;
+      if (!local || !pessoa || !inicio || !horaAtendimento || !problema || !acao) {
+        alert('Preencha todos os campos!');
         return;
       }
-      const agora = new Date();
-      const [h, m] = inicio.split(':');
-      const inicioDate = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), h, m);
-      const fimDate = new Date();
-      // Calcula tempo gasto
-      let diff = (fimDate - inicioDate) / 1000; // segundos
-      if (diff < 0) diff += 24 * 3600; // caso passe da meia-noite
+      // Calcular tempo gasto
+      const [h1, m1] = inicio.split(':');
+      const [h2, m2] = horaAtendimento.split(':');
+      let inicioDate = new Date();
+      inicioDate.setHours(Number(h1), Number(m1), 0, 0);
+      let fimDate = new Date();
+      fimDate.setHours(Number(h2), Number(m2), 0, 0);
+      let diff = (fimDate - inicioDate) / 1000;
+      if (diff < 0) diff += 24 * 3600;
       const horas = Math.floor(diff / 3600);
       const minutos = Math.floor((diff % 3600) / 60);
       const segundos = Math.floor(diff % 60);
+      const tempoGasto = `${horas}h ${minutos}m ${segundos}s`;
       // Salva atendimento
       const atendimento = {
         data: new Date().toISOString().slice(0,10),
-        local: document.getElementById('local').value,
+        local,
+        pessoa,
         inicio,
-        problema: document.getElementById('problema').value,
-        acao: document.getElementById('aqpc').value,
-        tempo: `${horas}h ${minutos}m ${segundos}s`,
+        horaAtendimento,
+        problema,
+        acao,
+        tempo: tempoGasto,
         usuario: usuarioLogado ? usuarioLogado.usuario : ''
       };
       await salvarAtendimento(atendimento);
       // Mostra resultado
       resultado.innerHTML = `
         <strong>Atendimento finalizado!</strong><br><br>
-        <b>Tempo gasto:</b> ${horas}h ${minutos}m ${segundos}s
+        <b>Pessoa:</b> ${pessoa}<br>
+        <b>Tempo gasto:</b> ${tempoGasto}
       `;
       resultado.classList.remove('hidden');
       form.classList.add('hidden');

@@ -92,14 +92,7 @@
     .hidden {
       display: none;
     }
-    .img-preview {
-      display: block;
-      margin: 10px auto 0 auto;
-      max-width: 100%;
-      max-height: 180px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
+  /* .img-preview, assinatura removidos */
   </style>
 </head>
 <body>
@@ -122,13 +115,30 @@
        <div id="resultados-pesquisa" style="margin-top:18px;"></div>
      </div>
      <!-- Fim tela de pesquisa -->
-     <form id="formulario">
-      <label for="login">Login</label>
-      <input type="text" id="login" required autocomplete="username" placeholder="Digite seu usuário">
-
-      <label for="senha">Senha</label>
-      <input type="password" id="senha" required autocomplete="current-password" placeholder="Digite sua senha">
-
+     <!-- Tela de login/cadastro -->
+     <div id="tela-login">
+       <h3>Login</h3>
+       <label for="login-user">Usuário</label>
+       <input type="text" id="login-user" required autocomplete="username">
+       <label for="login-pass">Senha</label>
+       <input type="password" id="login-pass" required autocomplete="current-password">
+       <button id="btn-login" class="btn">Entrar</button>
+       <div style="text-align:center;margin:10px 0;">ou</div>
+       <button id="btn-mostrar-cadastro" class="btn" style="background:#bdbdbd;color:#222;">Cadastrar Novo Usuário</button>
+     </div>
+     <div id="tela-cadastro" class="hidden">
+       <h3>Cadastro de Novo Usuário</h3>
+       <label for="cad-nome">Nome</label>
+       <input type="text" id="cad-nome" required>
+       <label for="cad-user">Usuário</label>
+       <input type="text" id="cad-user" required>
+       <label for="cad-pass">Senha</label>
+       <input type="password" id="cad-pass" required>
+       <button id="btn-cadastrar" class="btn">Cadastrar</button>
+       <button id="btn-voltar-login" class="btn" style="background:#bdbdbd;color:#222;">Voltar ao Login</button>
+     </div>
+     <div id="tela-aguarde" class="hidden card">Seu cadastro está aguardando aprovação do administrador.</div>
+     <form id="formulario" class="hidden">
       <label for="local">Local de Atendimento</label>
       <select id="local" required>
         <option value="">Selecione...</option>
@@ -136,32 +146,22 @@
         <option>Usinagem Bloco</option>
         <option>Usinagem Cabeçote</option>
       </select>
-
       <label for="inicio">Horário de Início</label>
       <input type="time" id="inicio" required>
-
       <label for="problema">Descrição do Problema</label>
       <textarea id="problema" required placeholder="Descreva o problema..."></textarea>
-
-      <label for="comentarios">Comentários</label>
-      <textarea id="comentarios" placeholder="Comentários adicionais..."></textarea>
-
-      <label for="aqpc">Análise AQPC</label>
-      <select id="aqpc" required>
-        <option value="">Selecione...</option>
-        <option>Procedente</option>
-        <option>Não procedente</option>
-      </select>
-
-      <label for="imagem">Imagem (anexar ou tirar foto)</label>
-      <input class="file-input" type="file" id="imagem" accept="image/*" capture="environment">
-
-      <img id="preview" class="img-preview hidden" alt="Prévia da imagem">
-
+      <label for="aqpc">Ação Tomada</label>
+      <textarea id="aqpc" placeholder="Descreva a ação tomada..." required></textarea>
       <button type="submit" class="btn">Finalizar Atendimento</button>
     </form>
-  <div id="resultado" class="card hidden"></div>
-  <button id="btn-pesquisar" class="btn" style="margin-top:18px;">Pesquisar Atendimentos</button>
+    <div id="resultado" class="card hidden"></div>
+    <button id="btn-pesquisar" class="btn hidden" style="margin-top:18px;">Pesquisar Atendimentos</button>
+    <!-- Tela de aprovação para admin -->
+    <div id="tela-admin" class="hidden">
+      <h3>Solicitações de Cadastro</h3>
+      <div id="lista-solicitacoes"></div>
+      <button id="btn-sair-admin" class="btn" style="background:#bdbdbd;color:#222;">Sair</button>
+    </div>
   </div>
   <script>
     // Firebase config (mesmo projeto do site.html)
@@ -177,7 +177,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Autenticação simples
+    // Elementos
     const form = document.getElementById('formulario');
     const resultado = document.getElementById('resultado');
     const btnPesquisar = document.getElementById('btn-pesquisar');
@@ -185,6 +185,54 @@
     const btnVoltarAtendimento = document.getElementById('btn-voltar-atendimento');
     const btnFiltrar = document.getElementById('btn-filtrar');
     const resultadosPesquisa = document.getElementById('resultados-pesquisa');
+    const telaLogin = document.getElementById('tela-login');
+    const telaCadastro = document.getElementById('tela-cadastro');
+    const telaAguarde = document.getElementById('tela-aguarde');
+    const btnLogin = document.getElementById('btn-login');
+    const btnMostrarCadastro = document.getElementById('btn-mostrar-cadastro');
+    const btnCadastrar = document.getElementById('btn-cadastrar');
+    const btnVoltarLogin = document.getElementById('btn-voltar-login');
+    const telaAdmin = document.getElementById('tela-admin');
+    const listaSolicitacoes = document.getElementById('lista-solicitacoes');
+    const btnSairAdmin = document.getElementById('btn-sair-admin');
+
+    let usuarioLogado = null;
+
+    // Funções de usuário
+    async function buscarUsuario(user, pass) {
+      const snap = await db.collection('usuarios')
+        .where('usuario', '==', user)
+        .where('senha', '==', pass)
+        .get();
+      if (snap.empty) return null;
+      return { id: snap.docs[0].id, ...snap.docs[0].data() };
+    }
+
+    async function buscarUsuarioPorNome(user) {
+      const snap = await db.collection('usuarios')
+        .where('usuario', '==', user)
+        .get();
+      if (snap.empty) return null;
+      return { id: snap.docs[0].id, ...snap.docs[0].data() };
+    }
+
+    async function cadastrarUsuario(nome, usuario, senha) {
+      await db.collection('usuarios').add({
+        nome, usuario, senha, aprovado: false, admin: false
+      });
+    }
+
+    async function buscarSolicitacoesPendentes() {
+      const snap = await db.collection('usuarios').where('aprovado', '==', false).get();
+      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    }
+
+    async function aprovarUsuario(id) {
+      await db.collection('usuarios').doc(id).update({ aprovado: true });
+    }
+    async function reprovarUsuario(id) {
+      await db.collection('usuarios').doc(id).delete();
+    }
 
     // Salvar atendimento no Firestore
     async function salvarAtendimento(at) {
@@ -200,17 +248,117 @@
       return snap.docs.map(doc => doc.data());
     }
 
-    form.addEventListener('submit', async function(e) {
-      e.preventDefault();
-
-      // Login e senha fixos
-      const login = document.getElementById('login').value.trim();
-      const senha = document.getElementById('senha').value.trim();
-      if (login !== 'Alexandre' || senha !== '1010') {
+    // Login
+    btnLogin.onclick = async function() {
+      const user = document.getElementById('login-user').value.trim();
+      const pass = document.getElementById('login-pass').value.trim();
+      if (!user || !pass) {
+        alert('Preencha usuário e senha!');
+        return;
+      }
+      // Admin fixo
+      if (user === 'Alexandre' && pass === '1010') {
+        usuarioLogado = { usuario: 'Alexandre', admin: true, aprovado: true };
+        mostrarTelaAdmin();
+        return;
+      }
+      const u = await buscarUsuario(user, pass);
+      if (!u) {
         alert('Usuário ou senha incorretos!');
         return;
       }
+      if (!u.aprovado) {
+        mostrarTelaAguarde();
+        return;
+      }
+      usuarioLogado = u;
+      mostrarTelaAtendimento();
+    };
 
+    btnMostrarCadastro.onclick = function() {
+      telaLogin.classList.add('hidden');
+      telaCadastro.classList.remove('hidden');
+    };
+    btnVoltarLogin.onclick = function() {
+      telaCadastro.classList.add('hidden');
+      telaLogin.classList.remove('hidden');
+    };
+
+    btnCadastrar.onclick = async function() {
+      const nome = document.getElementById('cad-nome').value.trim();
+      const usuario = document.getElementById('cad-user').value.trim();
+      const senha = document.getElementById('cad-pass').value.trim();
+      if (!nome || !usuario || !senha) {
+        alert('Preencha todos os campos!');
+        return;
+      }
+      const existe = await buscarUsuarioPorNome(usuario);
+      if (existe) {
+        alert('Usuário já existe!');
+        return;
+      }
+      await cadastrarUsuario(nome, usuario, senha);
+      telaCadastro.classList.add('hidden');
+      mostrarTelaAguarde();
+    };
+
+    function mostrarTelaAguarde() {
+      telaLogin.classList.add('hidden');
+      telaCadastro.classList.add('hidden');
+      telaAguarde.classList.remove('hidden');
+      form.classList.add('hidden');
+      btnPesquisar.classList.add('hidden');
+      telaAdmin.classList.add('hidden');
+      telaPesquisa.style.display = 'none';
+    }
+
+    function mostrarTelaAtendimento() {
+      telaLogin.classList.add('hidden');
+      telaCadastro.classList.add('hidden');
+      telaAguarde.classList.add('hidden');
+      form.classList.remove('hidden');
+      btnPesquisar.classList.remove('hidden');
+      telaAdmin.classList.add('hidden');
+      telaPesquisa.style.display = 'none';
+      resultado.classList.add('hidden');
+      form.reset();
+    }
+
+    function mostrarTelaAdmin() {
+      telaLogin.classList.add('hidden');
+      telaCadastro.classList.add('hidden');
+      telaAguarde.classList.add('hidden');
+      form.classList.add('hidden');
+      btnPesquisar.classList.add('hidden');
+      telaAdmin.classList.remove('hidden');
+      telaPesquisa.style.display = 'none';
+      carregarSolicitacoes();
+    }
+
+    async function carregarSolicitacoes() {
+      const lista = await buscarSolicitacoesPendentes();
+      if (!lista.length) {
+        listaSolicitacoes.innerHTML = '<em>Sem solicitações pendentes.</em>';
+        return;
+      }
+      listaSolicitacoes.innerHTML = lista.map(u => `
+        <div style="border:1px solid #ccc;border-radius:8px;padding:10px;margin-bottom:10px;">
+          <b>Nome:</b> ${u.nome}<br>
+          <b>Usuário:</b> ${u.usuario}<br>
+          <button onclick="aprovarUsuario('${u.id}').then(carregarSolicitacoes)">Aprovar</button>
+          <button onclick="reprovarUsuario('${u.id}').then(carregarSolicitacoes)" style="background:#e57373;color:#fff;">Reprovar</button>
+        </div>
+      `).join('');
+    }
+
+    btnSairAdmin.onclick = function() {
+      telaAdmin.classList.add('hidden');
+      telaLogin.classList.remove('hidden');
+    };
+
+    // Submissão do atendimento
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
       // Pega o horário de início
       const inicio = document.getElementById('inicio').value;
       if (!inicio) {
@@ -221,27 +369,23 @@
       const [h, m] = inicio.split(':');
       const inicioDate = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), h, m);
       const fimDate = new Date();
-
       // Calcula tempo gasto
       let diff = (fimDate - inicioDate) / 1000; // segundos
       if (diff < 0) diff += 24 * 3600; // caso passe da meia-noite
       const horas = Math.floor(diff / 3600);
       const minutos = Math.floor((diff % 3600) / 60);
       const segundos = Math.floor(diff % 60);
-
       // Salva atendimento
       const atendimento = {
         data: new Date().toISOString().slice(0,10),
-        login,
         local: document.getElementById('local').value,
         inicio,
         problema: document.getElementById('problema').value,
-        comentarios: document.getElementById('comentarios').value,
-        aqpc: document.getElementById('aqpc').value,
-        tempo: `${horas}h ${minutos}m ${segundos}s`
+        acao: document.getElementById('aqpc').value,
+        tempo: `${horas}h ${minutos}m ${segundos}s`,
+        usuario: usuarioLogado ? usuarioLogado.usuario : ''
       };
       await salvarAtendimento(atendimento);
-
       // Mostra resultado
       resultado.innerHTML = `
         <strong>Atendimento finalizado!</strong><br><br>
@@ -284,13 +428,24 @@
           <b>Data:</b> ${a.data}<br>
           <b>Departamento:</b> ${a.local}<br>
           <b>Início:</b> ${a.inicio}<br>
-          <b>Problema:</b> ${a.problema}<br>
-          <b>Comentários:</b> ${a.comentarios}<br>
-          <b>AQPC:</b> ${a.aqpc}<br>
-          <b>Tempo:</b> ${a.tempo}
+          <b>Descrição do Problema:</b> ${a.problema}<br>
+          <b>Ação Tomada:</b> ${a.acao}<br>
+          <b>Tempo:</b> ${a.tempo}<br>
+          <b>Usuário:</b> ${a.usuario || ''}
         </div>
       `).join('');
     }
+
+    // Inicialização: mostrar tela de login
+    window.onload = function() {
+      telaLogin.classList.remove('hidden');
+      telaCadastro.classList.add('hidden');
+      telaAguarde.classList.add('hidden');
+      form.classList.add('hidden');
+      btnPesquisar.classList.add('hidden');
+      telaAdmin.classList.add('hidden');
+      telaPesquisa.style.display = 'none';
+    };
   </script>
 </body>
 </html>

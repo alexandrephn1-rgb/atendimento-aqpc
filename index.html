@@ -2,942 +2,450 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Atendimento do time AQPC -XLDE</title>
+  <title>Atendimento de Linha - ALD4</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
   <style>
-    :root {
-      --primary: #1a73e8;
-      --primary-dark: #003366;
-      --success: #43a047;
-      --danger: #d32f2f;
-      --bg: #f4f6f8;
-      --card: #fff;
-      --text: #222;
-      --input-bg: #f7f9fa;
-      --border: #cfd8dc;
-      --shadow: 0 6px 32px rgba(0,0,0,0.10);
-      --footer: #e3e7ed;
-      --section: #e3f2fd;
-      --icon: #1a73e8;
-    }
-    [data-theme="dark"] {
-      --primary: #90caf9;
-      --primary-dark: #1976d2;
-      --success: #66bb6a;
-      --danger: #ef5350;
-      --bg: #181c24;
-      --card: #232a36;
-      --text: #f4f6f8;
-      --input-bg: #232a36;
-      --border: #374151;
-      --shadow: 0 6px 32px rgba(0,0,0,0.40);
-      --footer: #232a36;
-      --section: #263238;
-      --icon: #90caf9;
-    }
-    [data-theme="blue"] {
-      --primary: #1565c0;
-      --primary-dark: #0d47a1;
-      --success: #00bcd4;
-      --danger: #e57373;
-      --bg: #e3f2fd;
-      --card: #f5faff;
-      --text: #0d223a;
-      --input-bg: #e3f2fd;
-      --border: #90caf9;
-      --shadow: 0 6px 32px rgba(21,101,192,0.10);
-      --footer: #bbdefb;
-      --section: #bbdefb;
-      --icon: #1565c0;
-    }
-    html, body {
-      height: 100%;
+    body {
+      background: linear-gradient(135deg, #232526 0%, #414345 100%);
+      font-family: 'Segoe UI', Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Montserrat', Arial, sans-serif;
-      transition: background 0.3s, color 0.3s;
-    }
-    .theme-switch {
-      position: absolute;
-      top: 18px;
-      right: 24px;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .theme-btn {
-      background: var(--card);
-      border: 1.5px solid var(--border);
-      color: var(--primary);
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      font-size: 1.2rem;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s, border 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .theme-btn.active, .theme-btn:hover {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
+      min-height: 100vh;
+      color: #222;
     }
     .container {
-      max-width: 520px;
-      margin: 60px auto 30px auto;
-      background: var(--card);
+      max-width: 500px;
+      margin: 40px auto;
+      background: #fff;
       border-radius: 18px;
-      box-shadow: var(--shadow);
-      padding: 38px 32px 28px 32px;
-      position: relative;
-      animation: fadeIn 0.7s;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      padding: 32px 28px 24px 28px;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(30px);}
-      to { opacity: 1; transform: translateY(0);}
-    }
-    .gmb-logo {
-      display: block;
-      margin: 0 auto 18px auto;
-      max-width: 180px;
-      max-height: 70px;
-      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.10));
-      transition: filter 0.3s;
-    }
-    .login-card {
-      background: var(--card);
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(26,115,232,0.10);
-      padding: 32px 24px 24px 24px;
-      margin-bottom: 18px;
-      animation: fadeIn 0.7s;
-      position: relative;
-    }
-    .login-card h2 {
-      margin-bottom: 18px;
-      color: var(--primary);
-      font-size: 1.4rem;
-      font-weight: 700;
+    h2 {
       text-align: center;
-    }
-    .login-links {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 8px;
-      font-size: 0.97rem;
-    }
-    .login-links a {
-      color: var(--primary-dark);
-      text-decoration: underline;
-      cursor: pointer;
-      transition: color 0.2s;
-    }
-    .login-links a:hover {
-      color: var(--primary);
-    }
-    .lang-switch {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-    .lang-btn {
-      border: none;
-      background: var(--input-bg);
-      color: var(--text);
-      font-weight: 600;
-      font-size: 1rem;
-      padding: 7px 18px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-      outline: none;
-    }
-    .lang-btn.active, .lang-btn:hover {
-      background: var(--primary);
-      color: #fff;
+      color: #1a73e8;
+      margin-bottom: 28px;
+      letter-spacing: 1px;
     }
     label {
       display: block;
       margin-bottom: 6px;
       font-weight: 500;
-      color: var(--text);
-      font-size: 1rem;
+      color: #333;
     }
-    input[type="text"], input[type="password"], input[type="time"], input[type="date"], input[type="email"], select, textarea {
+    input[type="text"], input[type="password"], input[type="time"], select, textarea {
       width: 100%;
       padding: 10px 12px;
-      margin-bottom: 8px;
-      border: 1.5px solid var(--border);
-      border-radius: 7px;
-      background: var(--input-bg);
+      margin-bottom: 18px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #f7f9fa;
       font-size: 1rem;
-      color: var(--text);
-      transition: border 0.2s, background 0.2s, color 0.2s;
+      transition: border 0.2s;
     }
-    input:focus, select:focus, textarea:focus {
-      border: 1.5px solid var(--primary);
+    input[type="text"]:focus, input[type="password"]:focus, input[type="time"]:focus, select:focus, textarea:focus {
+      border: 1.5px solid #1a73e8;
       outline: none;
       background: #fff;
-      color: #222;
     }
     textarea {
       min-height: 60px;
       resize: vertical;
     }
+    .row {
+      display: flex;
+    <!-- Campos de anexo de foto/vídeo e assinatura removidos -->
+      flex: 1;
+    }
     .file-input {
       margin-bottom: 18px;
     }
-    .checkbox-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 18px;
-    }
-    .btn, .btn-email, .btn-reiniciar, .pdf-btn {
+    .btn {
       width: 100%;
       padding: 12px;
-      background: linear-gradient(90deg, var(--primary) 60%, var(--primary-dark) 100%);
+      background: linear-gradient(90deg, #1a73e8 60%, #00c6fb 100%);
       color: #fff;
       border: none;
-      border-radius: 7px;
+      border-radius: 8px;
       font-size: 1.1rem;
       font-weight: 600;
       cursor: pointer;
+      transition: background 0.2s;
       margin-top: 8px;
-      box-shadow: 0 2px 8px rgba(26,115,232,0.08);
-      transition: background 0.2s, color 0.2s;
     }
-    .btn:active, .btn-email:active, .btn-reiniciar:active, .pdf-btn:active {
-      background: var(--primary-dark);
-    }
-    .btn-email {
-      background: linear-gradient(90deg, var(--success) 60%, #1b5e20 100%);
-      margin-top: 10px;
-    }
-    .btn-reiniciar {
-      background: #bdbdbd;
-      color: #222;
-      margin-top: 10px;
-    }
-    .btn-reiniciar:hover {
-      background: #888;
-      color: #fff;
+    .btn:active {
+      background: #1765c1;
     }
     .card {
-      background: var(--section);
+      background: #e3f2fd;
       border-radius: 10px;
       padding: 18px;
       margin-top: 22px;
-      text-align: left;
+      text-align: center;
       box-shadow: 0 2px 8px rgba(26,115,232,0.08);
       color: #1765c1;
-      font-size: 1.08rem;
-      animation: fadeIn 0.7s;
+      font-size: 1.1rem;
     }
-    [data-theme="dark"] .card {
-      background: #263238;
-      color: #90caf9;
-    }
-    [data-theme="blue"] .card {
-      background: #e3f2fd;
-      color: #1565c0;
-    }
-    .hidden { display: none !important; }
-    .img-preview, .video-preview, .result-img, .result-video {
-      display: block;
-      margin: 10px auto 0 auto;
-      max-width: 100%;
-      max-height: 180px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      transition: box-shadow 0.2s;
-    }
-    .video-preview, .result-video {
-      background: #000;
-    }
-    .error-message {
-      color: var(--danger);
-      background: #ffebee;
-      border-radius: 6px;
-      padding: 8px 12px;
-      margin-bottom: 16px;
-      text-align: center;
-      font-size: 1rem;
+    .hidden {
       display: none;
     }
-    .result-label {
-      font-weight: 600;
-      color: var(--primary);
-      margin-right: 4px;
-    }
-    .result-row {
-      margin-bottom: 8px;
-    }
-    .result-title {
-      text-align: center;
-      font-size: 1.15rem;
-      font-weight: 700;
-      margin-bottom: 16px;
-      color: var(--success);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .result-title::before {
-      content: "✔️";
-      font-size: 1.2em;
-    }
-    .pdf-btn {
-      background: linear-gradient(90deg, var(--success) 60%, #1b5e20 100%);
-      margin-top: 18px;
-      margin-bottom: 0;
-    }
-    .signature-pad {
-      border: 1.5px solid var(--border);
-      border-radius: 7px;
-      background: #fff;
-      width: 100%;
-      height: 90px;
-      margin-bottom: 8px;
-      cursor: crosshair;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-      display: block;
-    }
-    .signature-actions {
-      text-align: right;
-      margin-bottom: 18px;
-    }
-    .signature-actions button {
-      background: var(--danger);
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      padding: 4px 12px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      margin-left: 8px;
-      transition: background 0.2s;
-    }
-    .signature-actions button:hover {
-      background: #b71c1c;
-    }
-    footer {
-      text-align: center;
-      color: #888;
-      background: var(--footer);
-      font-size: 0.97rem;
-      padding: 18px 0 10px 0;
-      border-radius: 0 0 18px 18px;
-      margin: 0 auto;
-      max-width: 520px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      letter-spacing: 0.5px;
-    }
-    @media (max-width: 600px) {
-      .container { padding: 18px 4vw 18px 4vw; }
-      .gmb-logo { max-width: 90px; }
-      footer { font-size: 0.89rem; }
-    }
+  /* .img-preview, assinatura removidos */
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-  <div class="theme-switch">
-    <button class="theme-btn" id="light-theme" title="Tema Claro">🌞</button>
-    <button class="theme-btn" id="dark-theme" title="Tema Escuro">🌙</button>
-    <button class="theme-btn" id="blue-theme" title="Azul Noturno">💧</button>
-  </div>
-  <div class="container">
-    <!-- LOGIN -->
-    <div id="login-area">
-      <div class="login-card">
-        <img src="https://logos-world.net/wp-content/uploads/2021/03/Chevrolet-Logo.png" alt="Chevrolet Logo" class="gmb-logo" id="gmb-logo-login">
-        <h2 id="login-title">Login - Atendimento de Linha</h2>
-        <div class="lang-switch" id="lang-switch-login">
-          <button class="lang-btn active" id="btn-br-login">BR</button>
-          <button class="lang-btn" id="btn-eng-login">ENG</button>
-        </div>
-        <div id="login-error" class="error-message"></div>
-        <form id="login-form">
-          <label for="login" id="label-login">Login</label>
-          <input type="text" id="login" required autocomplete="username" placeholder="Digite seu usuário">
-          <label for="senha" id="label-senha">Senha</label>
-          <input type="password" id="senha" required autocomplete="current-password" placeholder="Digite sua senha">
-          <button type="submit" class="btn" id="btn-entrar">Entrar</button>
-        </form>
-        <div class="login-links">
-          <a id="forgot-user">Esqueceu o usuário?</a>
-          <a id="forgot-pass">Esqueceu a senha?</a>
-          <a id="help-link">Precisa de ajuda?</a>
-        </div>
-      </div>
-    </div>
-    <!-- FORMULÁRIO -->
-    <form id="formulario" class="hidden">
-      <img src="https://logos-world.net/wp-content/uploads/2021/03/Chevrolet-Logo.png" alt="Chevrolet Logo" class="gmb-logo" id="gmb-logo-form">
-      <div class="section-title">Dados do Atendimento</div>
-      <label for="data" id="label-data">Data do Atendimento</label>
-      <input type="date" id="data" required>
-      <label for="local" id="label-local">Local de Atendimento</label>
+   <div class="container">
+     <h2>Atendimento de Linha - ALD4</h2>
+     <!-- Tela de pesquisa -->
+     <div id="tela-pesquisa" style="display:none;">
+       <h3>Pesquisar Atendimentos</h3>
+       <label for="filtro-data">Filtrar por Data:</label>
+       <input type="date" id="filtro-data">
+       <label for="filtro-depto">Filtrar por Departamento:</label>
+       <select id="filtro-depto">
+         <option value="">Todos</option>
+         <option>Linha de montagem</option>
+         <option>Usinagem Bloco</option>
+         <option>Usinagem Cabeçote</option>
+       </select>
+       <button id="btn-filtrar" class="btn" style="margin-top:10px;">Filtrar</button>
+       <button id="btn-voltar-atendimento" class="btn" style="background:#bdbdbd;color:#222;margin-top:10px;">Voltar ao Atendimento</button>
+       <div id="resultados-pesquisa" style="margin-top:18px;"></div>
+     </div>
+     <!-- Fim tela de pesquisa -->
+     <!-- Tela de login/cadastro -->
+     <div id="tela-login">
+       <h3>Login</h3>
+       <label for="login-user">Usuário</label>
+       <input type="text" id="login-user" required autocomplete="username">
+       <label for="login-pass">Senha</label>
+       <input type="password" id="login-pass" required autocomplete="current-password">
+       <button id="btn-login" class="btn">Entrar</button>
+       <div style="text-align:center;margin:10px 0;">ou</div>
+       <button id="btn-mostrar-cadastro" class="btn" style="background:#bdbdbd;color:#222;">Cadastrar Novo Usuário</button>
+     </div>
+     <div id="tela-cadastro" class="hidden">
+       <h3>Cadastro de Novo Usuário</h3>
+       <label for="cad-nome">Nome</label>
+       <input type="text" id="cad-nome" required>
+       <label for="cad-user">Usuário</label>
+       <input type="text" id="cad-user" required>
+       <label for="cad-pass">Senha</label>
+       <input type="password" id="cad-pass" required>
+       <button id="btn-cadastrar" class="btn">Cadastrar</button>
+       <button id="btn-voltar-login" class="btn" style="background:#bdbdbd;color:#222;">Voltar ao Login</button>
+     </div>
+     <div id="tela-aguarde" class="hidden card">Seu cadastro está aguardando aprovação do administrador.</div>
+     <form id="formulario" class="hidden">
+      <label for="local">Local de Atendimento</label>
       <select id="local" required>
-        <option value="" id="opt-local-default" disabled selected>Selecione...</option>
-        <option id="opt-local1">Linha de montagem</option>
-        <option id="opt-local2">Usinagem Bloco</option>
-        <option id="opt-local3">Usinagem Cabeçote</option>
+        <option value="">Selecione...</option>
+        <option>Linha de montagem</option>
+        <option>Usinagem Bloco</option>
+        <option>Usinagem Cabeçote</option>
       </select>
-      <label for="inicio" id="label-inicio">Horário de Início</label>
+      <label for="inicio">Horário de Início</label>
       <input type="time" id="inicio" required>
-      <label for="prioridade">Prioridade</label>
-      <select id="prioridade" required>
-        <option value="" disabled selected>Selecione...</option>
-        <option>Baixa</option>
-        <option>Média</option>
-        <option>Alta</option>
-      </select>
-      <div class="checkbox-group">
-        <input type="checkbox" id="retorno">
-        <label for="retorno" style="margin-bottom:0;">Necessita retorno?</label>
-      </div>
-      <label for="responsavel">Responsável pelo atendimento</label>
-      <input type="text" id="responsavel" required>
-      <label for="email">E-mail do responsável</label>
-      <input type="email" id="email" required>
-      <div class="section-title">Descrição e Análise</div>
-      <label for="problema" id="label-problema">Descrição do Problema</label>
+      <label for="problema">Descrição do Problema</label>
       <textarea id="problema" required placeholder="Descreva o problema..."></textarea>
-      <label for="comentarios" id="label-comentarios">Comentários</label>
-      <textarea id="comentarios" required placeholder="Comentários adicionais..."></textarea>
-      <label for="aqpc" id="label-aqpc">Análise AQPC</label>
-      <select id="aqpc" required>
-        <option value="" id="opt-aqpc-default" disabled selected>Selecione...</option>
-        <option id="opt-aqpc1">Procedente</option>
-        <option id="opt-aqpc2">Não procedente</option>
-      </select>
-      <div class="section-title">Anexos e Assinatura</div>
-      <label for="imagem" id="label-imagem">Imagem ou Vídeo (anexar ou tirar foto/vídeo)</label>
-      <input class="file-input" type="file" id="imagem" accept="image/*,video/*" required capture="environment">
-      <img id="preview" class="img-preview hidden" alt="Prévia da imagem">
-      <video id="previewVideo" class="video-preview hidden" controls></video>
-      <label for="assinatura">Assinatura digital (use o mouse ou dedo)</label>
-      <canvas id="assinatura" class="signature-pad"></canvas>
-      <div class="signature-actions">
-        <button type="button" id="limpar-assinatura">Limpar Assinatura</button>
-      </div>
-      <button type="submit" class="btn" id="btn-finalizar">Finalizar Atendimento</button>
+      <label for="aqpc">Ação Tomada</label>
+      <textarea id="aqpc" placeholder="Descreva a ação tomada..." required></textarea>
+      <button type="submit" class="btn">Finalizar Atendimento</button>
     </form>
-    <!-- RESULTADO -->
     <div id="resultado" class="card hidden"></div>
-    <div class="lang-switch hidden" id="lang-switch-resultado">
-      <button class="lang-btn" id="btn-br-resultado">PT</button>
-      <button class="lang-btn" id="btn-eng-resultado">EN</button>
+    <button id="btn-pesquisar" class="btn hidden" style="margin-top:18px;">Pesquisar Atendimentos</button>
+    <!-- Tela de aprovação para admin -->
+    <div id="tela-admin" class="hidden">
+      <h3>Solicitações de Cadastro</h3>
+      <div id="lista-solicitacoes"></div>
+      <button id="btn-sair-admin" class="btn" style="background:#bdbdbd;color:#222;">Sair</button>
     </div>
-    <button id="btn-pdf" class="pdf-btn hidden">Baixar PDF</button>
-    <button id="btn-email" class="btn-email hidden">Enviar por E-mail (Outlook)</button>
-    <button id="btn-reiniciar" class="btn btn-reiniciar hidden">Reiniciar Atendimento</button>
   </div>
-  <footer>
-    &copy; 2025 Atendimento de Linha - ALD4. Todos os direitos reservados.
-  </footer>
   <script>
-    // Temas
-    const html = document.documentElement;
-    const btnLight = document.getElementById('light-theme');
-    const btnDark = document.getElementById('dark-theme');
-    const btnBlue = document.getElementById('blue-theme');
-    function setTheme(theme) {
-      html.setAttribute('data-theme', theme);
-      btnLight.classList.toggle('active', theme === 'light');
-      btnDark.classList.toggle('active', theme === 'dark');
-      btnBlue.classList.toggle('active', theme === 'blue');
-      localStorage.setItem('ald4-theme', theme);
+    // Firebase config (mesmo projeto do site.html)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJNaxTZbqJqK7blLSqOAFLf_qB15YFzCY",
+      authDomain: "cadastro-de-pe.firebaseapp.com",
+      projectId: "cadastro-de-pe",
+      storageBucket: "cadastro-de-pe.appspot.com",
+      messagingSenderId: "828073645251",
+      appId: "1:828073645251:web:a0024851a47033ff37be76",
+      measurementId: "G-PFC70Y86LV"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Elementos
+    const form = document.getElementById('formulario');
+    const resultado = document.getElementById('resultado');
+    const btnPesquisar = document.getElementById('btn-pesquisar');
+    const telaPesquisa = document.getElementById('tela-pesquisa');
+    const btnVoltarAtendimento = document.getElementById('btn-voltar-atendimento');
+    const btnFiltrar = document.getElementById('btn-filtrar');
+    const resultadosPesquisa = document.getElementById('resultados-pesquisa');
+    const telaLogin = document.getElementById('tela-login');
+    const telaCadastro = document.getElementById('tela-cadastro');
+    const telaAguarde = document.getElementById('tela-aguarde');
+    const btnLogin = document.getElementById('btn-login');
+    const btnMostrarCadastro = document.getElementById('btn-mostrar-cadastro');
+    const btnCadastrar = document.getElementById('btn-cadastrar');
+    const btnVoltarLogin = document.getElementById('btn-voltar-login');
+    const telaAdmin = document.getElementById('tela-admin');
+    const listaSolicitacoes = document.getElementById('lista-solicitacoes');
+    const btnSairAdmin = document.getElementById('btn-sair-admin');
+
+    let usuarioLogado = null;
+
+    // Funções de usuário
+    async function buscarUsuario(user, pass) {
+      const snap = await db.collection('usuarios')
+        .where('usuario', '==', user)
+        .where('senha', '==', pass)
+        .get();
+      if (snap.empty) return null;
+      return { id: snap.docs[0].id, ...snap.docs[0].data() };
     }
-    btnLight.onclick = () => setTheme('light');
-    btnDark.onclick = () => setTheme('dark');
-    btnBlue.onclick = () => setTheme('blue');
-    setTheme(localStorage.getItem('ald4-theme') || 'light');
 
-    // Tradução
-    const textos = {
-      br: {
-        loginTitle: "Login - Atendimento de Linha",
-        labelLogin: "Login",
-        labelSenha: "Senha",
-        btnEntrar: "Entrar",
-        loginPlaceholder: "Digite seu usuário",
-        senhaPlaceholder: "Digite sua senha",
-        loginError: "Usuário ou senha incorretos!",
-        forgotUser: "Esqueceu o usuário?",
-        forgotPass: "Esqueceu a senha?",
-        help: "Precisa de ajuda?",
-        helpMsg: "Dúvidas? Fale com o suporte pelo ramal 1234 ou e-mail suporte@empresa.com",
-        forgotUserMsg: "Entre em contato com o suporte para recuperar seu usuário.",
-        forgotPassMsg: "Entre em contato com o suporte para redefinir sua senha.",
-        formTitle: "Atendimento de Linha - ALD4",
-        labelData: "Data do Atendimento",
-        labelLocal: "Local de Atendimento",
-        optLocalDefault: "Selecione...",
-        optLocal1: "Linha de montagem",
-        optLocal2: "Usinagem Bloco",
-        optLocal3: "Usinagem Cabeçote",
-        labelInicio: "Horário de Início",
-        labelProblema: "Descrição do Problema",
-        problemaPlaceholder: "Descreva o problema...",
-        labelComentarios: "Comentários",
-        comentariosPlaceholder: "Comentários adicionais...",
-        labelAqpc: "Análise AQPC",
-        optAqpcDefault: "Selecione...",
-        optAqpc1: "Procedente",
-        optAqpc2: "Não procedente",
-        labelImagem: "Imagem ou Vídeo (anexar ou tirar foto/vídeo)",
-        btnFinalizar: "Finalizar Atendimento",
-        resultadoTitle: "Atendimento finalizado!",
-        resultadoTempo: "Tempo gasto",
-        resultadoCampos: {
-          data: "Data do Atendimento",
-          local: "Local de Atendimento",
-          inicio: "Horário de Início",
-          prioridade: "Prioridade",
-          retorno: "Necessita retorno?",
-          responsavel: "Responsável",
-          email: "E-mail",
-          problema: "Descrição do Problema",
-          comentarios: "Comentários",
-          aqpc: "Análise AQPC",
-          imagem: "Imagem/Vídeo",
-          assinatura: "Assinatura"
-        },
-        resultadoVazio: "Não informado",
-        btnPdf: "Baixar PDF",
-        btnEmail: "Enviar por E-mail (Outlook)",
-        btnReiniciar: "Reiniciar Atendimento"
-      },
-      eng: {
-        loginTitle: "Login - Line Service",
-        labelLogin: "Username",
-        labelSenha: "Password",
-        btnEntrar: "Sign in",
-        loginPlaceholder: "Enter your username",
-        senhaPlaceholder: "Enter your password",
-        loginError: "Incorrect username or password!",
-        forgotUser: "Forgot username?",
-        forgotPass: "Forgot password?",
-        help: "Need help?",
-        helpMsg: "Questions? Contact support at ext. 1234 or email suporte@empresa.com",
-        forgotUserMsg: "Contact support to recover your username.",
-        forgotPassMsg: "Contact support to reset your password.",
-        formTitle: "Line Service - ALD4",
-        labelData: "Service Date",
-        labelLocal: "Service Location",
-        optLocalDefault: "Select...",
-        optLocal1: "Assembly Line",
-        optLocal2: "Block Machining",
-        optLocal3: "Head Machining",
-        labelInicio: "Start Time",
-        labelProblema: "Problem Description",
-        problemaPlaceholder: "Describe the problem...",
-        labelComentarios: "Comments",
-        comentariosPlaceholder: "Additional comments...",
-        labelAqpc: "AQPC Analysis",
-        optAqpcDefault: "Select...",
-        optAqpc1: "Valid",
-        optAqpc2: "Not valid",
-        labelImagem: "Image or Video (attach or take photo/video)",
-        btnFinalizar: "Finish Service",
-        resultadoTitle: "Service finished!",
-        resultadoTempo: "Time spent",
-        resultadoCampos: {
-          data: "Service Date",
-          local: "Service Location",
-          inicio: "Start Time",
-          prioridade: "Priority",
-          retorno: "Needs follow-up?",
-          responsavel: "Responsible",
-          email: "E-mail",
-          problema: "Problem Description",
-          comentarios: "Comments",
-          aqpc: "AQPC Analysis",
-          imagem: "Image/Video",
-          assinatura: "Signature"
-        },
-        resultadoVazio: "Not informed",
-        btnPdf: "Download PDF",
-        btnEmail: "Send by E-mail (Outlook)",
-        btnReiniciar: "Restart Service"
-      }
-    };
-
-    let idioma = 'br';
-    let dadosPreenchidos = {};
-    let imagemBase64 = '';
-    let videoUrl = '';
-    let assinaturaBase64 = '';
-
-    // Tradução dinâmica
-    function setIdioma(idiomaNovo) {
-      idioma = idiomaNovo;
-      // Login
-      document.getElementById('login-title').textContent = textos[idioma].loginTitle;
-      document.getElementById('label-login').textContent = textos[idioma].labelLogin;
-      document.getElementById('label-senha').textContent = textos[idioma].labelSenha;
-      document.getElementById('btn-entrar').textContent = textos[idioma].btnEntrar;
-      document.getElementById('login').placeholder = textos[idioma].loginPlaceholder;
-      document.getElementById('senha').placeholder = textos[idioma].senhaPlaceholder;
-      document.getElementById('forgot-user').textContent = textos[idioma].forgotUser;
-      document.getElementById('forgot-pass').textContent = textos[idioma].forgotPass;
-      document.getElementById('help-link').textContent = textos[idioma].help;
-      // Formulário
-      document.getElementById('label-data').textContent = textos[idioma].labelData;
-      document.getElementById('label-local').textContent = textos[idioma].labelLocal;
-      document.getElementById('opt-local-default').textContent = textos[idioma].optLocalDefault;
-      document.getElementById('opt-local1').textContent = textos[idioma].optLocal1;
-      document.getElementById('opt-local2').textContent = textos[idioma].optLocal2;
-      document.getElementById('opt-local3').textContent = textos[idioma].optLocal3;
-      document.getElementById('label-inicio').textContent = textos[idioma].labelInicio;
-      document.getElementById('label-problema').textContent = textos[idioma].labelProblema;
-      document.getElementById('problema').placeholder = textos[idioma].problemaPlaceholder;
-      document.getElementById('label-comentarios').textContent = textos[idioma].labelComentarios;
-      document.getElementById('comentarios').placeholder = textos[idioma].comentariosPlaceholder;
-      document.getElementById('label-aqpc').textContent = textos[idioma].labelAqpc;
-      document.getElementById('opt-aqpc-default').textContent = textos[idioma].optAqpcDefault;
-      document.getElementById('opt-aqpc1').textContent = textos[idioma].optAqpc1;
-      document.getElementById('opt-aqpc2').textContent = textos[idioma].optAqpc2;
-      document.getElementById('label-imagem').textContent = textos[idioma].labelImagem;
-      document.getElementById('btn-finalizar').textContent = textos[idioma].btnFinalizar;
-      document.getElementById('btn-pdf').textContent = textos[idioma].btnPdf;
-      document.getElementById('btn-email').textContent = textos[idioma].btnEmail;
-      document.getElementById('btn-reiniciar').textContent = textos[idioma].btnReiniciar;
-      document.getElementById('btn-br-login').classList.toggle('active', idioma === 'br');
-      document.getElementById('btn-eng-login').classList.toggle('active', idioma === 'eng');
-      document.getElementById('btn-br-resultado').classList.toggle('active', idioma === 'br');
-      document.getElementById('btn-eng-resultado').classList.toggle('active', idioma === 'eng');
-      if (!document.getElementById('resultado').classList.contains('hidden')) renderResultado();
+    async function buscarUsuarioPorNome(user) {
+      const snap = await db.collection('usuarios')
+        .where('usuario', '==', user)
+        .get();
+      if (snap.empty) return null;
+      return { id: snap.docs[0].id, ...snap.docs[0].data() };
     }
-    document.getElementById('btn-br-login').onclick = () => setIdioma('br');
-    document.getElementById('btn-eng-login').onclick = () => setIdioma('eng');
-    document.getElementById('btn-br-resultado').onclick = () => setIdioma('br');
-    document.getElementById('btn-eng-resultado').onclick = () => setIdioma('eng');
 
-    // Ajuda e recuperação de usuário/senha
-    document.getElementById('forgot-user').onclick = function() {
-      alert(textos[idioma].forgotUserMsg);
-    };
-    document.getElementById('forgot-pass').onclick = function() {
-      alert(textos[idioma].forgotPassMsg);
-    };
-    document.getElementById('help-link').onclick = function() {
-      alert(textos[idioma].helpMsg);
-    };
+    async function cadastrarUsuario(nome, usuario, senha) {
+      await db.collection('usuarios').add({
+        nome, usuario, senha, aprovado: false, admin: false
+      });
+    }
+
+    async function buscarSolicitacoesPendentes() {
+      const snap = await db.collection('usuarios').where('aprovado', '==', false).get();
+      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    }
+
+    async function aprovarUsuario(id) {
+      await db.collection('usuarios').doc(id).update({ aprovado: true });
+    }
+    async function reprovarUsuario(id) {
+      await db.collection('usuarios').doc(id).delete();
+    }
+
+    // Salvar atendimento no Firestore
+    async function salvarAtendimento(at) {
+      await db.collection('atendimentos').add(at);
+    }
+
+    // Buscar atendimentos do Firestore (com filtros)
+    async function buscarAtendimentos(data = '', depto = '') {
+      let ref = db.collection('atendimentos');
+      if (data) ref = ref.where('data', '==', data);
+      if (depto) ref = ref.where('local', '==', depto);
+      const snap = await ref.orderBy('data', 'desc').get();
+      return snap.docs.map(doc => doc.data());
+    }
 
     // Login
-    document.getElementById('login-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const login = document.getElementById('login').value.trim();
-      const senha = document.getElementById('senha').value.trim();
-      const loginError = document.getElementById('login-error');
-      if (login !== 'Alexandre' || senha !== '1010') {
-        loginError.textContent = textos[idioma].loginError;
-        loginError.style.display = 'block';
-      } else {
-        loginError.style.display = 'none';
-        document.getElementById('login-area').classList.add('hidden');
-        document.getElementById('formulario').classList.remove('hidden');
+    btnLogin.onclick = async function() {
+      const user = document.getElementById('login-user').value.trim();
+      const pass = document.getElementById('login-pass').value.trim();
+      if (!user || !pass) {
+        alert('Preencha usuário e senha!');
+        return;
       }
-    });
-
-    // Assinatura digital simples
-    const canvas = document.getElementById('assinatura');
-    const ctx = canvas.getContext('2d');
-    let drawing = false, lastX = 0, lastY = 0;
-    function getXY(e) {
-      const rect = canvas.getBoundingClientRect();
-      if (e.touches) {
-        return [
-          e.touches[0].clientX - rect.left,
-          e.touches[0].clientY - rect.top
-        ];
-      } else {
-        return [
-          e.clientX - rect.left,
-          e.clientY - rect.top
-        ];
+      // Admin fixo
+      if (user === 'Alexandre' && pass === '1010') {
+        usuarioLogado = { usuario: 'Alexandre', admin: true, aprovado: true };
+        mostrarTelaAdmin();
+        return;
       }
-    }
-    function startDraw(e) {
-      drawing = true;
-      [lastX, lastY] = getXY(e);
-    }
-    function draw(e) {
-      if (!drawing) return;
-      ctx.lineWidth = 2;
-      ctx.lineCap = 'round';
-      ctx.strokeStyle = '#1a73e8';
-      ctx.beginPath();
-      ctx.moveTo(lastX, lastY);
-      const [x, y] = getXY(e);
-      ctx.lineTo(x, y);
-      ctx.stroke();
-      [lastX, lastY] = [x, y];
-    }
-    function stopDraw() { drawing = false; }
-    canvas.addEventListener('mousedown', startDraw);
-    canvas.addEventListener('mousemove', draw);
-    canvas.addEventListener('mouseup', stopDraw);
-    canvas.addEventListener('mouseout', stopDraw);
-    canvas.addEventListener('touchstart', startDraw);
-    canvas.addEventListener('touchmove', function(e){ draw(e); e.preventDefault(); }, {passive:false});
-    canvas.addEventListener('touchend', stopDraw);
-    document.getElementById('limpar-assinatura').onclick = function() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const u = await buscarUsuario(user, pass);
+      if (!u) {
+        alert('Usuário ou senha incorretos!');
+        return;
+      }
+      if (!u.aprovado) {
+        mostrarTelaAguarde();
+        return;
+      }
+      usuarioLogado = u;
+      mostrarTelaAtendimento();
     };
 
-    // Imagem/vídeo preview
-    const inputImagem = document.getElementById('imagem');
-    const preview = document.getElementById('preview');
-    const previewVideo = document.getElementById('previewVideo');
-    inputImagem.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      imagemBase64 = '';
-      videoUrl = '';
-      preview.classList.add('hidden');
-      previewVideo.classList.add('hidden');
-      if (file) {
-        if (file.type.startsWith('image/')) {
-          const reader = new FileReader();
-          reader.onload = function(ev) {
-            preview.src = ev.target.result;
-            preview.classList.remove('hidden');
-            imagemBase64 = ev.target.result;
-          };
-          reader.readAsDataURL(file);
-        } else if (file.type.startsWith('video/')) {
-          videoUrl = URL.createObjectURL(file);
-          previewVideo.src = videoUrl;
-          previewVideo.classList.remove('hidden');
-        }
-      }
-    });
+    btnMostrarCadastro.onclick = function() {
+      telaLogin.classList.add('hidden');
+      telaCadastro.classList.remove('hidden');
+    };
+    btnVoltarLogin.onclick = function() {
+      telaCadastro.classList.add('hidden');
+      telaLogin.classList.remove('hidden');
+    };
 
-    // Tradução de valores
-    function traduzirValor(valor, campo) {
-      if (campo === "local") {
-        if (valor === textos.br.optLocal1 || valor === textos.eng.optLocal1) return textos[idioma].optLocal1;
-        if (valor === textos.br.optLocal2 || valor === textos.eng.optLocal2) return textos[idioma].optLocal2;
-        if (valor === textos.br.optLocal3 || valor === textos.eng.optLocal3) return textos[idioma].optLocal3;
+    btnCadastrar.onclick = async function() {
+      const nome = document.getElementById('cad-nome').value.trim();
+      const usuario = document.getElementById('cad-user').value.trim();
+      const senha = document.getElementById('cad-pass').value.trim();
+      if (!nome || !usuario || !senha) {
+        alert('Preencha todos os campos!');
+        return;
       }
-      if (campo === "aqpc") {
-        if (valor === textos.br.optAqpc1 || valor === textos.eng.optAqpc1) return textos[idioma].optAqpc1;
-        if (valor === textos.br.optAqpc2 || valor === textos.eng.optAqpc2) return textos[idioma].optAqpc2;
+      const existe = await buscarUsuarioPorNome(usuario);
+      if (existe) {
+        alert('Usuário já existe!');
+        return;
       }
-      if (campo === "prioridade") {
-        if (valor === "Baixa" || valor === "Low") return idioma === "br" ? "Baixa" : "Low";
-        if (valor === "Média" || valor === "Medium") return idioma === "br" ? "Média" : "Medium";
-        if (valor === "Alta" || valor === "High") return idioma === "br" ? "Alta" : "High";
-      }
-      if (campo === "retorno") {
-        return valor ? (idioma === "br" ? "Sim" : "Yes") : (idioma === "br" ? "Não" : "No");
-      }
-      return valor || textos[idioma].resultadoVazio;
-    }
-    function traduzirTextoLivre(texto) {
-      return texto || textos[idioma].resultadoVazio;
+      await cadastrarUsuario(nome, usuario, senha);
+      telaCadastro.classList.add('hidden');
+      mostrarTelaAguarde();
+    };
+
+    function mostrarTelaAguarde() {
+      telaLogin.classList.add('hidden');
+      telaCadastro.classList.add('hidden');
+      telaAguarde.classList.remove('hidden');
+      form.classList.add('hidden');
+      btnPesquisar.classList.add('hidden');
+      telaAdmin.classList.add('hidden');
+      telaPesquisa.style.display = 'none';
     }
 
-    // Submissão do formulário
-    document.getElementById('formulario').addEventListener('submit', function(e) {
+    function mostrarTelaAtendimento() {
+      telaLogin.classList.add('hidden');
+      telaCadastro.classList.add('hidden');
+      telaAguarde.classList.add('hidden');
+      form.classList.remove('hidden');
+      btnPesquisar.classList.remove('hidden');
+      telaAdmin.classList.add('hidden');
+      telaPesquisa.style.display = 'none';
+      resultado.classList.add('hidden');
+      form.reset();
+    }
+
+    function mostrarTelaAdmin() {
+      telaLogin.classList.add('hidden');
+      telaCadastro.classList.add('hidden');
+      telaAguarde.classList.add('hidden');
+      form.classList.add('hidden');
+      btnPesquisar.classList.add('hidden');
+      telaAdmin.classList.remove('hidden');
+      telaPesquisa.style.display = 'none';
+      carregarSolicitacoes();
+    }
+
+    async function carregarSolicitacoes() {
+      const lista = await buscarSolicitacoesPendentes();
+      if (!lista.length) {
+        listaSolicitacoes.innerHTML = '<em>Sem solicitações pendentes.</em>';
+        return;
+      }
+      listaSolicitacoes.innerHTML = lista.map(u => `
+        <div style="border:1px solid #ccc;border-radius:8px;padding:10px;margin-bottom:10px;">
+          <b>Nome:</b> ${u.nome}<br>
+          <b>Usuário:</b> ${u.usuario}<br>
+          <button onclick="aprovarUsuario('${u.id}').then(carregarSolicitacoes)">Aprovar</button>
+          <button onclick="reprovarUsuario('${u.id}').then(carregarSolicitacoes)" style="background:#e57373;color:#fff;">Reprovar</button>
+        </div>
+      `).join('');
+    }
+
+    btnSairAdmin.onclick = function() {
+      telaAdmin.classList.add('hidden');
+      telaLogin.classList.remove('hidden');
+    };
+
+    // Submissão do atendimento
+    form.addEventListener('submit', async function(e) {
       e.preventDefault();
+      // Pega o horário de início
       const inicio = document.getElementById('inicio').value;
       if (!inicio) {
-        alert(idioma === 'br' ? 'Informe o horário de início!' : 'Enter the start time!');
+        alert('Informe o horário de início!');
         return;
       }
       const agora = new Date();
       const [h, m] = inicio.split(':');
       const inicioDate = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), h, m);
       const fimDate = new Date();
-      let diff = (fimDate - inicioDate) / 1000;
-      if (diff < 0) diff += 24 * 3600;
+      // Calcula tempo gasto
+      let diff = (fimDate - inicioDate) / 1000; // segundos
+      if (diff < 0) diff += 24 * 3600; // caso passe da meia-noite
       const horas = Math.floor(diff / 3600);
       const minutos = Math.floor((diff % 3600) / 60);
       const segundos = Math.floor(diff % 60);
-
-      assinaturaBase64 = canvas.toDataURL("image/png");
-
-      dadosPreenchidos = {
-        data: document.getElementById('data').value,
+      // Salva atendimento
+      const atendimento = {
+        data: new Date().toISOString().slice(0,10),
         local: document.getElementById('local').value,
-        inicio: inicio,
-        prioridade: document.getElementById('prioridade').value,
-        retorno: document.getElementById('retorno').checked,
-        responsavel: document.getElementById('responsavel').value,
-        email: document.getElementById('email').value,
+        inicio,
         problema: document.getElementById('problema').value,
-        comentarios: document.getElementById('comentarios').value,
-        aqpc: document.getElementById('aqpc').value,
-        imagem: imagemBase64,
-        video: videoUrl,
-        assinatura: assinaturaBase64,
-        tempo: { horas, minutos, segundos }
+        acao: document.getElementById('aqpc').value,
+        tempo: `${horas}h ${minutos}m ${segundos}s`,
+        usuario: usuarioLogado ? usuarioLogado.usuario : ''
       };
-      renderResultado();
-      document.getElementById('formulario').classList.add('hidden');
-      document.getElementById('resultado').classList.remove('hidden');
-      document.getElementById('lang-switch-resultado').classList.remove('hidden');
-      document.getElementById('btn-pdf').classList.remove('hidden');
-      document.getElementById('btn-email').classList.remove('hidden');
-      document.getElementById('btn-reiniciar').classList.remove('hidden');
+      await salvarAtendimento(atendimento);
+      // Mostra resultado
+      resultado.innerHTML = `
+        <strong>Atendimento finalizado!</strong><br><br>
+        <b>Tempo gasto:</b> ${horas}h ${minutos}m ${segundos}s
+      `;
+      resultado.classList.remove('hidden');
+      form.classList.add('hidden');
     });
 
-    function renderResultado() {
-      const t = textos[idioma];
-      const campos = t.resultadoCampos;
-      const d = dadosPreenchidos;
-      let local = traduzirValor(d.local, "local");
-      let aqpc = traduzirValor(d.aqpc, "aqpc");
-      let problema = traduzirTextoLivre(d.problema);
-      let comentarios = traduzirTextoLivre(d.comentarios);
+    // Botão para mostrar tela de pesquisa
+    btnPesquisar.onclick = async function() {
+      form.style.display = 'none';
+      resultado.classList.add('hidden');
+      telaPesquisa.style.display = 'block';
+      const lista = await buscarAtendimentos();
+      mostrarResultados(lista);
+    };
 
-      let midiaHtml = '';
-      if (d.imagem) {
-        midiaHtml += `<img src="${d.imagem}" class="result-img" alt="Imagem">`;
-      }
-      if (d.video) {
-        midiaHtml += `<video src="${d.video}" class="result-video" controls></video>`;
-      }
-      let assinaturaHtml = '';
-      if (d.assinatura) {
-        assinaturaHtml = `<img src="${d.assinatura}" alt="Assinatura" style="max-width:180px;max-height:60px;display:block;margin-top:8px;">`;
-      }
+    // Botão voltar ao atendimento
+    btnVoltarAtendimento.onclick = function() {
+      telaPesquisa.style.display = 'none';
+      form.style.display = '';
+    };
 
-      document.getElementById('resultado').innerHTML = `
-        <img src="https://logos-world.net/wp-content/uploads/2021/03/Chevrolet-Logo.png" alt="Chevrolet Logo" class="gmb-logo" style="margin-bottom:10px;">
-        <div class="result-title">${t.resultadoTitle}</div>
-        <div class="result-row"><span class="result-label">${campos.data}:</span> ${d.data || t.resultadoVazio}</div>
-        <div class="result-row"><span class="result-label">${campos.local}:</span> ${local}</div>
-        <div class="result-row"><span class="result-label">${campos.inicio}:</span> ${d.inicio || t.resultadoVazio}</div>
-        <div class="result-row"><span class="result-label">${campos.prioridade}:</span> ${traduzirValor(d.prioridade, "prioridade")}</div>
-        <div class="result-row"><span class="result-label">${campos.retorno}:</span> ${traduzirValor(d.retorno, "retorno")}</div>
-        <div class="result-row"><span class="result-label">${campos.responsavel}:</span> ${d.responsavel || t.resultadoVazio}</div>
-        <div class="result-row"><span class="result-label">${campos.email}:</span> ${d.email || t.resultadoVazio}</div>
-        <div class="result-row"><span class="result-label">${campos.problema}:</span> ${problema.replace(/\n/g, '<br>')}</div>
-        <div class="result-row"><span class="result-label">${campos.comentarios}:</span> ${comentarios.replace(/\n/g, '<br>')}</div>
-        <div class="result-row"><span class="result-label">${campos.aqpc}:</span> ${aqpc}</div>
-        <div class="result-row"><span class="result-label">${t.resultadoTempo}:</span> ${d.tempo.horas}h ${d.tempo.minutos}m ${d.tempo.segundos}s</div>
-        ${midiaHtml ? `<div class="result-row"><span class="result-label">${campos.imagem}:</span><br>${midiaHtml}</div>` : ''}
-        ${assinaturaHtml ? `<div class="result-row"><span class="result-label">${campos.assinatura}:</span><br>${assinaturaHtml}</div>` : ''}
-      `;
+    // Filtrar atendimentos
+    btnFiltrar.onclick = async function() {
+      const data = document.getElementById('filtro-data').value;
+      const depto = document.getElementById('filtro-depto').value;
+      const lista = await buscarAtendimentos(data, depto);
+      mostrarResultados(lista);
+    };
+
+    function mostrarResultados(lista) {
+      if (!lista.length) {
+        resultadosPesquisa.innerHTML = '<em>Nenhum atendimento encontrado.</em>';
+        return;
+      }
+      resultadosPesquisa.innerHTML = lista.map(a => `
+        <div style="border:1px solid #ccc;border-radius:8px;padding:10px;margin-bottom:10px;">
+          <b>Data:</b> ${a.data}<br>
+          <b>Departamento:</b> ${a.local}<br>
+          <b>Início:</b> ${a.inicio}<br>
+          <b>Descrição do Problema:</b> ${a.problema}<br>
+          <b>Ação Tomada:</b> ${a.acao}<br>
+          <b>Tempo:</b> ${a.tempo}<br>
+          <b>Usuário:</b> ${a.usuario || ''}
+        </div>
+      `).join('');
     }
 
-    // PDF
-    document.getElementById('btn-pdf').onclick = function() {
-      const t = textos[idioma];
-      const campos = t.resultadoCampos;
-      const d = dadosPreenchidos;
-      let local = traduzirValor(d.local, "local");
-      let aqpc = traduzirValor(d.aqpc, "aqpc");
-      let problema = traduzirTextoLivre(d.problema);
-      let comentarios = traduzirTextoLivre(d.comentarios);
-
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      let y = 15;
-
-      doc.addImage("https://logos-world.net/wp-content/uploads/2021/03/Chevrolet-Logo.png", "PNG", 80, y, 50, 20);
-      y += 25;
-
-      doc.setFontSize(15);
-      doc.setTextColor(26, 115, 232);
-      doc.text(t.resultadoTitle, 105, y, { align: "center" });
-      y += 10;
-
-      doc.setFontSize(11);
-      doc.setTextColor(0,0,0);
-      doc.text(`${campos.data}: ${d.data || t.resultadoVazio}`, 15, y);
-      y += 8;
-      doc.text(`${campos.local}: ${local}`, 15, y);
-      y += 8;
-      doc.text(`${campos.inicio}: ${d.inicio || t.resultadoVazio}`, 15, y);
-      y += 8;
-      doc.text(`${campos.prioridade}: ${traduzirValor(d.prioridade, "prioridade")}`, 15, y);
-      y += 8;
-      doc.text(`${campos.retorno}: ${traduzirValor(d.retorno, "retorno")}`, 15, y);
-      y += 8;
-      doc.text(`${campos.responsavel}: ${d.responsavel || t.resultadoVazio}`, 15, y);
-      y += 8;
-      doc.text(`${campos.email}: ${d.email || t.resultadoVazio}`, 15, y);
-      y += 8;
-
-      let problemaLines = doc.splitTextToSize(`${campos.problema}: ${problema}`, 180);
-      doc.text(problemaLines, 15, y);
-      y += problemaLines.length * 7;
-
-      let comentariosLines = doc.splitTextToSize(`${campos.comentarios}: ${comentarios}`, 180);
-      doc.text(comentariosLines, 15, y);
-      y += comentariosLines.length * 7;
-
-      doc.text(`${campos.aqpc}: ${aqpc}`, 15, y);
-      y += 8;
-
-      doc.text(`${t.resultadoTempo}: ${d.tempo.horas}h ${d.tempo.minutos}m ${d.tempo.segundos}s`, 15, y);
-      y += 8;
-
-      if (d.imagem) {
-        try {
-          doc.text(`${campos.imagem}:`, 15, y);
-          y += 3;
-          doc.addImage(d.imagem, "JPEG", 15, y, 60, 40);
-          y += 45;
-        } catch (e) {}
-      }
-      if (d.assinatura) {
-        try {
-          doc.text(`${campos.assinatura}:`, 15, y);
-          y += 3;
-          doc.addImage(d.assinatura, "PNG", 15, y, 60, 20);
-          y += 25;
-        } catch (e) {}
-      }
-      doc.save("atendimento-ald4.pdf");
+    // Inicialização: mostrar tela de login
+    window.onload = function() {
+      telaLogin.classList.remove('hidden');
+      telaCadastro.classList.add('hidden');
+      telaAguarde.classList.add('hidden');
+      form.classList.add('hidden');
+      btnPesquisar.classList.add('hidden');
+      telaAdmin.classList.add('hidden');
+      telaPesquisa.style.display = 'none';
     };
-
-    // E-mail
-    document.getElementById('btn-email').onclick = function() {
-      const t = textos[idioma];
-      const campos = t.resultadoCampos;
-      const d = dadosPreenchidos;
-      let body = `${t.resultadoTitle}\n\n`;
-      for (const k in campos) {
-        body += `${campos[k]}: ${d[k] ? d[k] : t.resultadoVazio}\n`;
-      }
-      body += `\n${t.btnPdf}: (anexo)`;
-      window.location.href = `mailto:?subject=${encodeURIComponent(t.formTitle)}&body=${encodeURIComponent(body)}`;
-    };
-
-    // Reiniciar
-    document.getElementById('btn-reiniciar').onclick = function() {
-      document.getElementById('formulario').reset();
-      preview.classList.add('hidden');
-      previewVideo.classList.add('hidden');
-      inputImagem.value = "";
-      document.getElementById('resultado').classList.add('hidden');
-      document.getElementById('lang-switch-resultado').classList.add('hidden');
-      document.getElementById('btn-pdf').classList.add('hidden');
-      document.getElementById('btn-email').classList.add('hidden');
-      document.getElementById('btn-reiniciar').classList.add('hidden');
-      document.getElementById('formulario').classList.remove('hidden');
-      imagemBase64 = '';
-      videoUrl = '';
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    };
-
-    setIdioma('br');
   </script>
 </body>
 </html>

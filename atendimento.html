@@ -367,15 +367,7 @@
       // Admin fixo
       if (user === 'Alexandre' && pass === '1010') {
         usuarioLogado = { usuario: 'Alexandre', admin: true, aprovado: true };
-        telaLogin.classList.add('hidden');
-        telaCadastro.classList.add('hidden');
-        telaAguarde.classList.add('hidden');
-        form.classList.remove('hidden');
-        btnPesquisar.classList.remove('hidden');
-        telaAdmin.classList.add('hidden');
-        telaPesquisa.style.display = 'none';
-        resultado.classList.add('hidden');
-        form.reset();
+        mostrarTelaAtendimento();
         adminBar.classList.remove('hidden');
         return;
       }
@@ -461,6 +453,7 @@
       telaPesquisa.style.display = 'none';
       resultado.classList.add('hidden');
       form.reset();
+      // Sempre mostrar barra admin para admin
       if (usuarioLogado && usuarioLogado.admin) {
         adminBar.classList.remove('hidden');
       } else {

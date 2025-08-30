@@ -191,7 +191,11 @@
        <button id="btn-cadastrar" class="btn">Cadastrar</button>
        <button id="btn-voltar-login" class="btn" style="background:#bdbdbd;color:#222;">Voltar ao Login</button>
      </div>
-     <div id="tela-aguarde" class="hidden card">Seu cadastro está aguardando aprovação do administrador.</div>
+     <div id="tela-aguarde" class="hidden card">
+       Seu cadastro está aguardando aprovação do administrador.<br><br>
+       <button id="btn-voltar-aguarde" class="btn" style="background:#bdbdbd;color:#222;max-width:200px;margin:0 auto;display:block;">Voltar ao Login</button>
+       <div id="aguarde-timer" style="text-align:center;font-size:0.98rem;color:#888;margin-top:8px;"></div>
+     </div>
      <form id="formulario" class="hidden">
       <label for="local">Local de Atendimento</label>
       <select id="local" required>
@@ -245,19 +249,21 @@
     const resultadosPesquisa = document.getElementById('resultados-pesquisa');
     const telaLogin = document.getElementById('tela-login');
     const telaCadastro = document.getElementById('tela-cadastro');
-    const telaAguarde = document.getElementById('tela-aguarde');
+  const telaAguarde = document.getElementById('tela-aguarde');
+  const btnVoltarAguarde = document.getElementById('btn-voltar-aguarde');
+  const aguardeTimer = document.getElementById('aguarde-timer');
     const btnLogin = document.getElementById('btn-login');
     const btnMostrarCadastro = document.getElementById('btn-mostrar-cadastro');
     const btnCadastrar = document.getElementById('btn-cadastrar');
     const btnVoltarLogin = document.getElementById('btn-voltar-login');
-    const telaAdmin = document.getElementById('tela-admin');
-    const listaSolicitacoes = document.getElementById('lista-solicitacoes');
-    const adminBar = document.getElementById('admin-bar');
-    const btnAprovacoes = document.getElementById('btn-aprovacoes');
-    const btnSairAdminBar = document.getElementById('btn-sair-admin-bar');
-    const btnVoltarApp = document.getElementById('btn-voltar-app');
-    const btnIrFormulario = document.getElementById('btn-ir-formulario');
-    const btnIrPesquisa = document.getElementById('btn-ir-pesquisa');
+  const telaAdmin = document.getElementById('tela-admin');
+  const listaSolicitacoes = document.getElementById('lista-solicitacoes');
+  const adminBar = document.getElementById('admin-bar');
+  const btnAprovacoes = document.getElementById('btn-aprovacoes');
+  const btnSairAdminBar = document.getElementById('btn-sair-admin-bar');
+  const btnVoltarApp = document.getElementById('btn-voltar-app');
+  const btnIrFormulario = document.getElementById('btn-ir-formulario');
+  const btnIrPesquisa = document.getElementById('btn-ir-pesquisa');
 
     let usuarioLogado = null;
 
@@ -367,6 +373,7 @@
       mostrarTelaAguarde();
     };
 
+    let aguardeTimeout = null;
     function mostrarTelaAguarde() {
       telaLogin.classList.add('hidden');
       telaCadastro.classList.add('hidden');
@@ -375,7 +382,27 @@
       btnPesquisar.classList.add('hidden');
       telaAdmin.classList.add('hidden');
       telaPesquisa.style.display = 'none';
+      aguardeTimer.textContent = "Voltando ao login em 10s...";
+      let segundos = 10;
+      if (aguardeTimeout) clearInterval(aguardeTimeout);
+      aguardeTimeout = setInterval(() => {
+        segundos--;
+        aguardeTimer.textContent = `Voltando ao login em ${segundos}s...`;
+        if (segundos <= 0) {
+          clearInterval(aguardeTimeout);
+          voltarParaLogin();
+        }
+      }, 1000);
     }
+
+    function voltarParaLogin() {
+      telaAguarde.classList.add('hidden');
+      telaLogin.classList.remove('hidden');
+      aguardeTimer.textContent = "";
+      if (aguardeTimeout) clearInterval(aguardeTimeout);
+    }
+
+    btnVoltarAguarde.onclick = voltarParaLogin;
 
     function mostrarTelaAtendimento() {
       telaLogin.classList.add('hidden');

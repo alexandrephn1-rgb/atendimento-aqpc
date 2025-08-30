@@ -215,7 +215,7 @@
        <button id="btn-voltar-aguarde" class="btn" style="background:#bdbdbd;color:#222;max-width:200px;margin:0 auto;display:block;">Voltar ao Login</button>
        <div id="aguarde-timer" style="text-align:center;font-size:0.98rem;color:#888;margin-top:8px;"></div>
      </div>
-  <button id="btn-sair-form" class="btn" style="background:#bdbdbd;color:#222;display:none;margin-bottom:10px;">Sair</button>
+  <button id="btn-sair-form" class="btn" style="background:#bdbdbd;color:#222;margin-bottom:10px;">Sair</button>
   <form id="formulario" class="hidden">
       <label for="local">Local de Atendimento</label>
       <select id="local" required>
@@ -498,7 +498,7 @@
     btnAprovacoes.onclick = function() {
       mostrarTelaAdmin();
     };
-    if (btnSairAppAdmin) btnSairAppAdmin.onclick = sairApp;
+  if (btnSairAppAdmin) btnSairAppAdmin.onclick = sairApp;
     btnIrFormulario.onclick = function() {
       mostrarTelaAtendimento();
     };
@@ -583,10 +583,8 @@
       mostrarResultados(lista);
     };
 
-    // Botão sair em todas as telas (menos login)
-    document.getElementById('btn-sair-form').onclick = sairApp;
-    document.getElementById('btn-sair-admin').onclick = sairApp;
-    if (btnVoltarLoginPesquisa) btnVoltarLoginPesquisa.onclick = sairApp;
+
+    // Função sairApp: sempre retorna para login e esconde todas as telas
     function sairApp() {
       usuarioLogado = null;
       telaLogin.classList.remove('hidden');
@@ -599,6 +597,12 @@
       resultado.classList.add('hidden');
       adminBar.classList.add('hidden');
     }
+
+    // Botão sair em todas as telas (menos login)
+    document.getElementById('btn-sair-form').onclick = sairApp;
+    document.getElementById('btn-sair-admin').onclick = sairApp;
+    if (btnVoltarLoginPesquisa) btnVoltarLoginPesquisa.onclick = sairApp;
+    if (btnSairAppAdmin) btnSairAppAdmin.onclick = sairApp;
 
     // Filtrar atendimentos
     btnFiltrar.onclick = async function() {
@@ -635,4 +639,9 @@
       btnPesquisar.classList.add('hidden');
       telaAdmin.classList.add('hidden');
       telaPesquisa.style.display = 'none';
-     
+      adminBar.classList.add('hidden');
+      document.getElementById('btn-sair-form').style.display = 'block';
+    };
+  </script>
+</body>
+</html>

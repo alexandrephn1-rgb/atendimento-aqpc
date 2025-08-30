@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Atendimento de Linha - ALD4</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #232526 0%, #414345 100%);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      color: #222;
+    }
+    .container {
+      max-width: 500px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      padding: 32px 28px 24px 28px;
+    }
+    h2 {
+      text-align: center;
+      color: #1a73e8;
+      margin-bottom: 28px;
+      letter-spacing: 1px;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #333;
+    }
+    input[type="text"], input[type="password"], input[type="time"], select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 18px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #f7f9fa;
+      font-size: 1rem;
+      transition: border 0.2s;
+    }
+    input[type="text"]:focus, input[type="password"]:focus, input[type="time"]:focus, select:focus, textarea:focus {
+      border: 1.5px solid #1a73e8;
+      outline: none;
+      background: #fff;
+    }
+    textarea {
+      min-height: 60px;
+      resize: vertical;
+    }
+    .row {
+      display: flex;
+    <!-- Campos de anexo de foto/vídeo e assinatura removidos -->
+      flex: 1;
+    }
+    .file-input {
+      margin-bottom: 18px;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(90deg, #1a73e8 60%, #00c6fb 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 8px;
+    }
+    .btn:active {
+      background: #1765c1;
+    }
+    .card {
+      background: #e3f2fd;
+      border-radius: 10px;
+      padding: 18px;
+      margin-top: 22px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(26,115,232,0.08);
+      color: #1765c1;
+      font-size: 1.1rem;
+    }
+    .hidden {
+      display: none;
+    }
+    .img-preview {
+      display: block;
+      margin: 10px auto 0 auto;
+      max-width: 100%;
+      max-height: 180px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+  </style>
+</head>
+<body>
+   <div class="container">
+     <h2>Atendimento de Linha - ALD4</h2>
+     <!-- Tela de pesquisa -->
+     <div id="tela-pesquisa" style="display:none;">
+       <h3>Pesquisar Atendimentos</h3>
+       <label for="filtro-data">Filtrar por Data:</label>
+       <input type="date" id="filtro-data">
+       <label for="filtro-depto">Filtrar por Departamento:</label>
+       <select id="filtro-depto">
+         <option value="">Todos</option>
+         <option>Linha de montagem</option>
+         <option>Usinagem Bloco</option>
+         <option>Usinagem Cabeçote</option>
+       </select>
+       <button id="btn-filtrar" class="btn" style="margin-top:10px;">Filtrar</button>
+       <button id="btn-voltar-atendimento" class="btn" style="background:#bdbdbd;color:#222;margin-top:10px;">Voltar ao Atendimento</button>
+       <div id="resultados-pesquisa" style="margin-top:18px;"></div>
+     </div>
+     <!-- Fim tela de pesquisa -->
+     <form id="formulario">
+      <label for="login">Login</label>
+      <input type="text" id="login" required autocomplete="username" placeholder="Digite seu usuário">
+
+      <label for="senha">Senha</label>
+      <input type="password" id="senha" required autocomplete="current-password" placeholder="Digite sua senha">
+
+      <label for="local">Local de Atendimento</label>
+      <select id="local" required>
+        <option value="">Selecione...</option>
+        <option>Linha de montagem</option>
+        <option>Usinagem Bloco</option>
+        <option>Usinagem Cabeçote</option>
+      </select>
+
+      <label for="inicio">Horário de Início</label>
+      <input type="time" id="inicio" required>
+
+      <label for="problema">Descrição do Problema</label>
+      <textarea id="problema" required placeholder="Descreva o problema..."></textarea>
+
+      <label for="comentarios">Comentários</label>
+      <textarea id="comentarios" placeholder="Comentários adicionais..."></textarea>
+
+      <label for="aqpc">Análise AQPC</label>
+      <select id="aqpc" required>
+        <option value="">Selecione...</option>
+        <option>Procedente</option>
+        <option>Não procedente</option>
+      </select>
+
+      <label for="imagem">Imagem (anexar ou tirar foto)</label>
+      <input class="file-input" type="file" id="imagem" accept="image/*" capture="environment">
+
+      <img id="preview" class="img-preview hidden" alt="Prévia da imagem">
+
+      <button type="submit" class="btn">Finalizar Atendimento</button>
+    </form>
+  <div id="resultado" class="card hidden"></div>
+  <button id="btn-pesquisar" class="btn" style="margin-top:18px;">Pesquisar Atendimentos</button>
+  </div>
+  <script>
+    // Firebase config (mesmo projeto do site.html)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJNaxTZbqJqK7blLSqOAFLf_qB15YFzCY",
+      authDomain: "cadastro-de-pe.firebaseapp.com",
+      projectId: "cadastro-de-pe",
+      storageBucket: "cadastro-de-pe.appspot.com",
+      messagingSenderId: "828073645251",
+      appId: "1:828073645251:web:a0024851a47033ff37be76",
+      measurementId: "G-PFC70Y86LV"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Autenticação simples
+    const form = document.getElementById('formulario');
+    const resultado = document.getElementById('resultado');
+    const btnPesquisar = document.getElementById('btn-pesquisar');
+    const telaPesquisa = document.getElementById('tela-pesquisa');
+    const btnVoltarAtendimento = document.getElementById('btn-voltar-atendimento');
+    const btnFiltrar = document.getElementById('btn-filtrar');
+    const resultadosPesquisa = document.getElementById('resultados-pesquisa');
+
+    // Salvar atendimento no Firestore
+    async function salvarAtendimento(at) {
+      await db.collection('atendimentos').add(at);
+    }
+
+    // Buscar atendimentos do Firestore (com filtros)
+    async function buscarAtendimentos(data = '', depto = '') {
+      let ref = db.collection('atendimentos');
+      if (data) ref = ref.where('data', '==', data);
+      if (depto) ref = ref.where('local', '==', depto);
+      const snap = await ref.orderBy('data', 'desc').get();
+      return snap.docs.map(doc => doc.data());
+    }
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      // Login e senha fixos
+      const login = document.getElementById('login').value.trim();
+      const senha = document.getElementById('senha').value.trim();
+      if (login !== 'Alexandre' || senha !== '1010') {
+        alert('Usuário ou senha incorretos!');
+        return;
+      }
+
+      // Pega o horário de início
+      const inicio = document.getElementById('inicio').value;
+      if (!inicio) {
+        alert('Informe o horário de início!');
+        return;
+      }
+      const agora = new Date();
+      const [h, m] = inicio.split(':');
+      const inicioDate = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), h, m);
+      const fimDate = new Date();
+
+      // Calcula tempo gasto
+      let diff = (fimDate - inicioDate) / 1000; // segundos
+      if (diff < 0) diff += 24 * 3600; // caso passe da meia-noite
+      const horas = Math.floor(diff / 3600);
+      const minutos = Math.floor((diff % 3600) / 60);
+      const segundos = Math.floor(diff % 60);
+
+      // Salva atendimento
+      const atendimento = {
+        data: new Date().toISOString().slice(0,10),
+        login,
+        local: document.getElementById('local').value,
+        inicio,
+        problema: document.getElementById('problema').value,
+        comentarios: document.getElementById('comentarios').value,
+        aqpc: document.getElementById('aqpc').value,
+        tempo: `${horas}h ${minutos}m ${segundos}s`
+      };
+      await salvarAtendimento(atendimento);
+
+      // Mostra resultado
+      resultado.innerHTML = `
+        <strong>Atendimento finalizado!</strong><br><br>
+        <b>Tempo gasto:</b> ${horas}h ${minutos}m ${segundos}s
+      `;
+      resultado.classList.remove('hidden');
+      form.classList.add('hidden');
+    });
+
+    // Botão para mostrar tela de pesquisa
+    btnPesquisar.onclick = async function() {
+      form.style.display = 'none';
+      resultado.classList.add('hidden');
+      telaPesquisa.style.display = 'block';
+      const lista = await buscarAtendimentos();
+      mostrarResultados(lista);
+    };
+
+    // Botão voltar ao atendimento
+    btnVoltarAtendimento.onclick = function() {
+      telaPesquisa.style.display = 'none';
+      form.style.display = '';
+    };
+
+    // Filtrar atendimentos
+    btnFiltrar.onclick = async function() {
+      const data = document.getElementById('filtro-data').value;
+      const depto = document.getElementById('filtro-depto').value;
+      const lista = await buscarAtendimentos(data, depto);
+      mostrarResultados(lista);
+    };
+
+    function mostrarResultados(lista) {
+      if (!lista.length) {
+        resultadosPesquisa.innerHTML = '<em>Nenhum atendimento encontrado.</em>';
+        return;
+      }
+      resultadosPesquisa.innerHTML = lista.map(a => `
+        <div style="border:1px solid #ccc;border-radius:8px;padding:10px;margin-bottom:10px;">
+          <b>Data:</b> ${a.data}<br>
+          <b>Departamento:</b> ${a.local}<br>
+          <b>Início:</b> ${a.inicio}<br>
+          <b>Problema:</b> ${a.problema}<br>
+          <b>Comentários:</b> ${a.comentarios}<br>
+          <b>AQPC:</b> ${a.aqpc}<br>
+          <b>Tempo:</b> ${a.tempo}
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>

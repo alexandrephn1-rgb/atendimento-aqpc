@@ -214,7 +214,11 @@
      <div id="tela-admin" class="hidden card">
       <h3 style="color:var(--primary);text-align:center;margin-bottom:18px;">Solicitações de Cadastro</h3>
       <div id="lista-solicitacoes"></div>
-      <button id="btn-voltar-app" class="btn" style="background:#bdbdbd;color:#222;margin-top:18px;">Voltar para o App</button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;">
+        <button id="btn-voltar-app" class="btn" style="background:#bdbdbd;color:#222;flex:1;">Voltar para o App</button>
+        <button id="btn-ir-formulario" class="btn" style="flex:1;">Formulário</button>
+        <button id="btn-ir-pesquisa" class="btn" style="flex:1;">Pesquisar</button>
+      </div>
     </div>
   </div>
   <script>
@@ -246,12 +250,14 @@
     const btnMostrarCadastro = document.getElementById('btn-mostrar-cadastro');
     const btnCadastrar = document.getElementById('btn-cadastrar');
     const btnVoltarLogin = document.getElementById('btn-voltar-login');
-  const telaAdmin = document.getElementById('tela-admin');
-  const listaSolicitacoes = document.getElementById('lista-solicitacoes');
-  const adminBar = document.getElementById('admin-bar');
-  const btnAprovacoes = document.getElementById('btn-aprovacoes');
-  const btnSairAdminBar = document.getElementById('btn-sair-admin-bar');
-  const btnVoltarApp = document.getElementById('btn-voltar-app');
+    const telaAdmin = document.getElementById('tela-admin');
+    const listaSolicitacoes = document.getElementById('lista-solicitacoes');
+    const adminBar = document.getElementById('admin-bar');
+    const btnAprovacoes = document.getElementById('btn-aprovacoes');
+    const btnSairAdminBar = document.getElementById('btn-sair-admin-bar');
+    const btnVoltarApp = document.getElementById('btn-voltar-app');
+    const btnIrFormulario = document.getElementById('btn-ir-formulario');
+    const btnIrPesquisa = document.getElementById('btn-ir-pesquisa');
 
     let usuarioLogado = null;
 
@@ -422,6 +428,20 @@
     btnVoltarApp.onclick = function() {
       telaAdmin.classList.add('hidden');
       mostrarTelaAtendimento();
+    };
+    btnIrFormulario.onclick = function() {
+      telaAdmin.classList.add('hidden');
+      mostrarTelaAtendimento();
+    };
+    btnIrPesquisa.onclick = function() {
+      telaAdmin.classList.add('hidden');
+      form.classList.add('hidden');
+      resultado.classList.add('hidden');
+      telaPesquisa.style.display = 'block';
+      btnPesquisar.classList.remove('hidden');
+      adminBar.classList.remove('hidden');
+      // Carrega todos os atendimentos ao abrir pesquisa
+      buscarAtendimentos().then(mostrarResultados);
     };
     btnSairAdminBar.onclick = function() {
       adminBar.classList.add('hidden');

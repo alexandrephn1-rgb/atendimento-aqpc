@@ -4,100 +4,154 @@
   <meta charset="UTF-8">
   <title>Atendimento de Linha - ALD4</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
   <style>
-    body {
-      background: linear-gradient(135deg, #232526 0%, #414345 100%);
-      font-family: 'Segoe UI', Arial, sans-serif;
+    :root {
+      --primary: #1a73e8;
+      --primary-dark: #003366;
+      --success: #43a047;
+      --danger: #d32f2f;
+      --bg: #f4f6f8;
+      --card: #fff;
+      --text: #222;
+      --input-bg: #f7f9fa;
+      --border: #cfd8dc;
+      --shadow: 0 6px 32px rgba(0,0,0,0.10);
+      --footer: #e3e7ed;
+      --section: #e3f2fd;
+      --icon: #1a73e8;
+    }
+    html, body {
+      height: 100%;
       margin: 0;
       padding: 0;
-      min-height: 100vh;
-      color: #222;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Montserrat', Arial, sans-serif;
+      transition: background 0.3s, color 0.3s;
     }
     .container {
-      max-width: 500px;
-      margin: 40px auto;
-      background: #fff;
+      max-width: 520px;
+      margin: 60px auto 30px auto;
+      background: var(--card);
       border-radius: 18px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-      padding: 32px 28px 24px 28px;
+      box-shadow: var(--shadow);
+      padding: 38px 32px 28px 32px;
+      position: relative;
+      animation: fadeIn 0.7s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .admin-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--section);
+      border-radius: 8px;
+      padding: 10px 18px;
+      margin-bottom: 18px;
+      font-size: 1.05rem;
+      color: var(--primary-dark);
+      box-shadow: 0 2px 8px rgba(26,115,232,0.08);
+    }
+    .admin-bar .btn-admin {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 7px 18px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-left: 10px;
+      transition: background 0.2s;
+    }
+    .admin-bar .btn-admin:active {
+      background: var(--primary-dark);
     }
     h2 {
       text-align: center;
-      color: #1a73e8;
+      color: var(--primary);
       margin-bottom: 28px;
       letter-spacing: 1px;
+      font-family: 'Montserrat', Arial, sans-serif;
     }
     label {
       display: block;
       margin-bottom: 6px;
       font-weight: 500;
-      color: #333;
+      color: var(--text);
+      font-size: 1rem;
     }
     input[type="text"], input[type="password"], input[type="time"], select, textarea {
       width: 100%;
       padding: 10px 12px;
-      margin-bottom: 18px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      background: #f7f9fa;
+      margin-bottom: 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 7px;
+      background: var(--input-bg);
       font-size: 1rem;
-      transition: border 0.2s;
+      color: var(--text);
+      transition: border 0.2s, background 0.2s, color 0.2s;
     }
-    input[type="text"]:focus, input[type="password"]:focus, input[type="time"]:focus, select:focus, textarea:focus {
-      border: 1.5px solid #1a73e8;
+    input:focus, select:focus, textarea:focus {
+      border: 1.5px solid var(--primary);
       outline: none;
       background: #fff;
+      color: #222;
     }
     textarea {
       min-height: 60px;
       resize: vertical;
     }
-    .row {
-      display: flex;
-    <!-- Campos de anexo de foto/vídeo e assinatura removidos -->
-      flex: 1;
-    }
-    .file-input {
-      margin-bottom: 18px;
-    }
     .btn {
       width: 100%;
       padding: 12px;
-      background: linear-gradient(90deg, #1a73e8 60%, #00c6fb 100%);
+      background: linear-gradient(90deg, var(--primary) 60%, var(--primary-dark) 100%);
       color: #fff;
       border: none;
-      border-radius: 8px;
+      border-radius: 7px;
       font-size: 1.1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
       margin-top: 8px;
+      box-shadow: 0 2px 8px rgba(26,115,232,0.08);
+      transition: background 0.2s, color 0.2s;
     }
     .btn:active {
-      background: #1765c1;
+      background: var(--primary-dark);
     }
     .card {
-      background: #e3f2fd;
+      background: var(--section);
       border-radius: 10px;
       padding: 18px;
       margin-top: 22px;
-      text-align: center;
+      text-align: left;
       box-shadow: 0 2px 8px rgba(26,115,232,0.08);
-      color: #1765c1;
-      font-size: 1.1rem;
+      color: var(--primary-dark);
+      font-size: 1.08rem;
+      animation: fadeIn 0.7s;
     }
-    .hidden {
-      display: none;
+    .hidden { display: none !important; }
+    @media (max-width: 600px) {
+      .container { padding: 18px 4vw 18px 4vw; }
+      h2 { font-size: 1.2rem; }
     }
-  /* .img-preview, assinatura removidos */
   </style>
 </head>
 <body>
    <div class="container">
      <h2>Atendimento de Linha - ALD4</h2>
+     <div id="admin-bar" class="admin-bar hidden">
+       <span>Administrador: Alexandre</span>
+       <button id="btn-aprovacoes" class="btn-admin">Aprovar Usuários</button>
+       <button id="btn-sair-admin-bar" class="btn-admin" style="background:#bdbdbd;color:#222;">Sair</button>
+     </div>
      <!-- Tela de pesquisa -->
      <div id="tela-pesquisa" style="display:none;">
        <h3>Pesquisar Atendimentos</h3>
@@ -157,10 +211,10 @@
     <div id="resultado" class="card hidden"></div>
     <button id="btn-pesquisar" class="btn hidden" style="margin-top:18px;">Pesquisar Atendimentos</button>
     <!-- Tela de aprovação para admin -->
-    <div id="tela-admin" class="hidden">
-      <h3>Solicitações de Cadastro</h3>
+     <div id="tela-admin" class="hidden card">
+      <h3 style="color:var(--primary);text-align:center;margin-bottom:18px;">Solicitações de Cadastro</h3>
       <div id="lista-solicitacoes"></div>
-      <button id="btn-sair-admin" class="btn" style="background:#bdbdbd;color:#222;">Sair</button>
+      <button id="btn-voltar-app" class="btn" style="background:#bdbdbd;color:#222;margin-top:18px;">Voltar para o App</button>
     </div>
   </div>
   <script>
@@ -192,9 +246,12 @@
     const btnMostrarCadastro = document.getElementById('btn-mostrar-cadastro');
     const btnCadastrar = document.getElementById('btn-cadastrar');
     const btnVoltarLogin = document.getElementById('btn-voltar-login');
-    const telaAdmin = document.getElementById('tela-admin');
-    const listaSolicitacoes = document.getElementById('lista-solicitacoes');
-    const btnSairAdmin = document.getElementById('btn-sair-admin');
+  const telaAdmin = document.getElementById('tela-admin');
+  const listaSolicitacoes = document.getElementById('lista-solicitacoes');
+  const adminBar = document.getElementById('admin-bar');
+  const btnAprovacoes = document.getElementById('btn-aprovacoes');
+  const btnSairAdminBar = document.getElementById('btn-sair-admin-bar');
+  const btnVoltarApp = document.getElementById('btn-voltar-app');
 
     let usuarioLogado = null;
 
@@ -259,7 +316,8 @@
       // Admin fixo
       if (user === 'Alexandre' && pass === '1010') {
         usuarioLogado = { usuario: 'Alexandre', admin: true, aprovado: true };
-        mostrarTelaAdmin();
+        mostrarTelaAtendimento();
+        adminBar.classList.remove('hidden');
         return;
       }
       const u = await buscarUsuario(user, pass);
@@ -273,6 +331,7 @@
       }
       usuarioLogado = u;
       mostrarTelaAtendimento();
+      if (u.admin) adminBar.classList.remove('hidden');
     };
 
     btnMostrarCadastro.onclick = function() {
@@ -322,6 +381,11 @@
       telaPesquisa.style.display = 'none';
       resultado.classList.add('hidden');
       form.reset();
+      if (usuarioLogado && usuarioLogado.admin) {
+        adminBar.classList.remove('hidden');
+      } else {
+        adminBar.classList.add('hidden');
+      }
     }
 
     function mostrarTelaAdmin() {
@@ -332,6 +396,7 @@
       btnPesquisar.classList.add('hidden');
       telaAdmin.classList.remove('hidden');
       telaPesquisa.style.display = 'none';
+      adminBar.classList.remove('hidden');
       carregarSolicitacoes();
     }
 
@@ -351,9 +416,20 @@
       `).join('');
     }
 
-    btnSairAdmin.onclick = function() {
+    btnAprovacoes.onclick = function() {
+      mostrarTelaAdmin();
+    };
+    btnVoltarApp.onclick = function() {
+      telaAdmin.classList.add('hidden');
+      mostrarTelaAtendimento();
+    };
+    btnSairAdminBar.onclick = function() {
+      adminBar.classList.add('hidden');
+      usuarioLogado = null;
       telaAdmin.classList.add('hidden');
       telaLogin.classList.remove('hidden');
+      form.classList.add('hidden');
+      btnPesquisar.classList.add('hidden');
     };
 
     // Submissão do atendimento
@@ -445,6 +521,7 @@
       btnPesquisar.classList.add('hidden');
       telaAdmin.classList.add('hidden');
       telaPesquisa.style.display = 'none';
+      adminBar.classList.add('hidden');
     };
   </script>
 </body>

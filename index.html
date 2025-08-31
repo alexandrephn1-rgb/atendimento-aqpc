@@ -24,6 +24,36 @@
       --section: #e3f2fd;
       --icon: #1a73e8;
     }
+    [data-theme="dark"] {
+      --primary: #90caf9;
+      --primary-dark: #1976d2;
+      --success: #66bb6a;
+      --danger: #ef5350;
+      --bg: #181c24;
+      --card: #232a36;
+      --text: #f4f6f8;
+      --input-bg: #232a36;
+      --border: #374151;
+      --shadow: 0 6px 32px rgba(0,0,0,0.40);
+      --footer: #232a36;
+      --section: #263238;
+      --icon: #90caf9;
+    }
+    [data-theme="blue"] {
+      --primary: #1565c0;
+      --primary-dark: #0d47a1;
+      --success: #00bcd4;
+      --danger: #e57373;
+      --bg: #e3f2fd;
+      --card: #f5faff;
+      --text: #0d223a;
+      --input-bg: #e3f2fd;
+      --border: #90caf9;
+      --shadow: 0 6px 32px rgba(21,101,192,0.10);
+      --footer: #bbdefb;
+      --section: #bbdefb;
+      --icon: #1565c0;
+    }
     html, body {
       height: 100%;
       margin: 0;
@@ -161,19 +191,53 @@
 </head>
 <body>
    <div class="container">
-  <div style="display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:18px;position:relative;">
-    <!-- Seletor de tema no canto superior direito -->
-    <div id="theme-selector" style="position:absolute;top:0;right:0;display:flex;gap:6px;align-items:center;z-index:2;">
-      <label for="select-theme" style="font-size:0.95rem;color:#555;margin-right:2px;">Tema:</label>
-      <select id="select-theme" style="padding:3px 8px;border-radius:5px;">
-        <option value="claro">Claro</option>
-        <option value="escuro">Escuro</option>
-        <option value="azul">Azul Claro</option>
-      </select>
-    </div>
-    <img src="https://logos-world.net/wp-content/uploads/2021/03/Chevrolet-Logo.png" alt="Chevrolet Logo" class="gmb-logo" id="gmb-logo-login" style="max-width:70px;max-height:70px;">
+  <div class="theme-switch" style="position:fixed;top:18px;right:24px;z-index:100;">
+    <button class="theme-btn" id="light-theme" title="Tema Claro">🌞</button>
+    <button class="theme-btn" id="dark-theme" title="Tema Escuro">🌙</button>
+    <button class="theme-btn" id="blue-theme" title="Azul Noturno">💧</button>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:18px;">
+    <img src="https://logos-world.net/wp-content/uploads/2021/03/Chevrolet-Logo.png" alt="Chevrolet Logo" class="gmb-logo" id="gmb-logo-login" style="max-width:180px;max-height:70px;">
     <h2 style="margin:0;">Atendimento de Linha - AQPC</h2>
   </div>
+  <style>
+    .theme-switch {
+      position: fixed;
+      top: 18px;
+      right: 24px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .theme-btn {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      color: var(--primary);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .theme-btn.active, .theme-btn:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .gmb-logo {
+      display: block;
+      margin: 0 auto 18px auto;
+      max-width: 180px;
+      max-height: 70px;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.10));
+      transition: filter 0.3s;
+    }
+  </style>
   <style>
     body.theme-escuro {
       background: #181c24;
@@ -226,26 +290,22 @@
     }
   </style>
   <script>
-    // Tema: troca de tema
-    const selectTheme = document.getElementById('select-theme');
+    // Temas
+    const html = document.documentElement;
+    const btnLight = document.getElementById('light-theme');
+    const btnDark = document.getElementById('dark-theme');
+    const btnBlue = document.getElementById('blue-theme');
     function setTheme(theme) {
-      document.body.classList.remove('theme-escuro', 'theme-azul');
-      if (theme === 'escuro') document.body.classList.add('theme-escuro');
-      else if (theme === 'azul') document.body.classList.add('theme-azul');
-      // Salva preferência
-      localStorage.setItem('tema-atendimento', theme);
+      html.setAttribute('data-theme', theme);
+      btnLight.classList.toggle('active', theme === 'light');
+      btnDark.classList.toggle('active', theme === 'dark');
+      btnBlue.classList.toggle('active', theme === 'blue');
+      localStorage.setItem('ald4-theme', theme);
     }
-    if (selectTheme) {
-      selectTheme.addEventListener('change', function() {
-        setTheme(this.value);
-      });
-      // Carrega preferência salva
-      const temaSalvo = localStorage.getItem('tema-atendimento');
-      if (temaSalvo) {
-        selectTheme.value = temaSalvo;
-        setTheme(temaSalvo);
-      }
-    }
+    btnLight.onclick = () => setTheme('light');
+    btnDark.onclick = () => setTheme('dark');
+    btnBlue.onclick = () => setTheme('blue');
+    setTheme(localStorage.getItem('ald4-theme') || 'light');
   </script>
 <!-- Sugestões de temas:
 1. Claro: Visual limpo, fundo branco, azul como cor principal.
@@ -336,12 +396,12 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
     <button id="btn-pesquisar" class="btn hidden" style="margin-top:18px;">Pesquisar Atendimentos</button>
     <!-- Tela de aprovação para admin -->
   <div id="tela-admin" class="hidden card">
-   <button id="btn-sair-admin" class="btn" style="background:#bdbdbd;color:#222;margin-bottom:10px;">Sair</button>
       <h3 style="color:var(--primary);text-align:center;margin-bottom:18px;">Solicitações de Cadastro</h3>
       <div id="lista-solicitacoes"></div>
         <div class="admin-approvals-bar">
           <button id="btn-ir-formulario" class="btn btn-admin-approvals">Formulário</button>
           <button id="btn-ir-pesquisa" class="btn btn-admin-approvals">Pesquisar</button>
+          <button id="btn-sair-admin" class="btn" style="background:#bdbdbd;color:#222;">Sair</button>
         </div>
     </div>
   </div>

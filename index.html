@@ -359,12 +359,13 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
        <h3>Cadastro de Novo Usuário</h3>
        <label for="cad-nome">Nome</label>
        <input type="text" id="cad-nome" required>
-       <label for="cad-user">Inspetor de Qualidade</label>
-       <input type="text" id="cad-user" required>
        <label for="cad-pass">Senha</label>
        <input type="password" id="cad-pass" required>
+       <label for="cad-confirmar">Confirmar Senha</label>
+       <input type="password" id="cad-confirmar" required>
        <button id="btn-cadastrar" class="btn">Cadastrar</button>
        <button id="btn-voltar-login" class="btn" style="background:#bdbdbd;color:#222;">Voltar ao Login</button>
+       <div id="cadastro-msg" style="margin-top:10px;color:#d32f2f;"></div>
      </div>
      <div id="tela-aguarde" class="hidden card">
        Seu cadastro está aguardando aprovação do administrador.<br><br>
@@ -380,16 +381,20 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
         <option>Usinagem Cabeçote</option>
         <option>MVA S10</option>
       </select>
-      <label for="pessoa">Pessoa que realizou o atendimento</label>
-      <input type="text" id="pessoa" required placeholder="Nome do responsável">
-  <label for="data-atendimento">Data do Atendimento</label>
-  <input type="date" id="data-atendimento" required>
+      <label for="pessoa">Inspetor de Qualidade</label>
+      <input type="text" id="pessoa" required placeholder="Nome do inspetor">
+      <label for="nome-peca">Nome da Peça</label>
+      <input type="text" id="nome-peca" required placeholder="Digite o nome da peça">
+      <label for="numero-peca">Número da Peça</label>
+      <input type="text" id="numero-peca" required placeholder="Digite o número da peça">
+      <label for="data-atendimento">Data do Atendimento</label>
+      <input type="date" id="data-atendimento" required>
       <label for="hora-atendimento">Hora do Atendimento</label>
       <input type="time" id="hora-atendimento" required>
       <label for="problema">Descrição do Problema</label>
       <textarea id="problema" required placeholder="Descreva o problema..."></textarea>
-      <label for="aqpc">Ação Tomada</label>
-      <textarea id="aqpc" placeholder="Descreva a ação tomada..." required></textarea>
+      <label for="aqpc">Ação da Qualidade</label>
+      <textarea id="aqpc" placeholder="Descreva a ação da qualidade..." required></textarea>
       <button type="submit" class="btn">Finalizar Atendimento</button>
     </form>
   <div id="resultado" class="card hidden"></div>
@@ -398,21 +403,53 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
   <div id="tela-admin" class="hidden card">
       <h3 style="color:var(--primary);text-align:center;margin-bottom:18px;">Solicitações de Cadastro</h3>
       <div id="lista-solicitacoes"></div>
+      <h3 style="color:var(--primary);text-align:center;margin:24px 0 12px 0;">Usuários Cadastrados</h3>
+      <div id="lista-usuarios"></div>
         <div class="admin-approvals-bar">
           <button id="btn-ir-formulario" class="btn btn-admin-approvals">Formulário</button>
           <button id="btn-ir-pesquisa" class="btn btn-admin-approvals">Pesquisar</button>
           <button id="btn-sair-admin" class="btn" style="background:#bdbdbd;color:#222;">Sair</button>
         </div>
+  // Função para buscar todos os usuários aprovados (exceto admin fixo)
+  async function buscarUsuariosAprovados() {
+    const snap = await db.collection('usuarios').where('aprovado', '==', true).get();
+    return snap.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .filter(u => u.usuario !== 'Alexandre');
+  }
+
+  // Função para remover usuário
+  async function removerUsuario(id) {
+    if (!confirm('Tem certeza que deseja remover este usuário?')) return;
+    await db.collection('usuarios').doc(id).delete();
+    carregarUsuarios();
+  }
+
+  // Carregar lista de usuários aprovados
+  async function carregarUsuarios() {
+    const lista = await buscarUsuariosAprovados();
+    const listaDiv = document.getElementById('lista-usuarios');
+    if (!lista.length) {
+      listaDiv.innerHTML = '<em>Nenhum usuário cadastrado.</em>';
+      return;
+    }
+    listaDiv.innerHTML = lista.map(u => `
+      <div style="border:1px solid #ccc;border-radius:8px;padding:10px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+        <span><b>Nome:</b> ${u.nome} <br><b>Usuário:</b> ${u.usuario}</span>
+        <button onclick="removerUsuario('${u.id}')" style="background:#e57373;color:#fff;border:none;border-radius:6px;padding:7px 14px;cursor:pointer;">Remover</button>
+      </div>
+    `).join('');
+  }
     </div>
   </div>
   <div id="tela-recuperar-senha" class="hidden card">
        <h3>Recuperar/Criar Nova Senha</h3>
-       <label for="recupera-user">Inspetor de Qualidade</label>
-       <input type="text" id="recupera-user" required>
        <label for="recupera-nome">Nome</label>
        <input type="text" id="recupera-nome" required>
        <label for="recupera-nova-senha">Nova Senha</label>
        <input type="password" id="recupera-nova-senha" required>
+       <label for="recupera-confirmar">Confirmar Nova Senha</label>
+       <input type="password" id="recupera-confirmar" required>
        <button id="btn-confirmar-recupera" class="btn">Salvar Nova Senha</button>
        <button id="btn-voltar-login-recupera" class="btn" style="background:#bdbdbd;color:#222;">Voltar ao Login</button>
        <div id="recupera-msg" style="margin-top:10px;color:#d32f2f;"></div>
@@ -566,18 +603,25 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
 
     btnCadastrar.onclick = async function() {
       const nome = document.getElementById('cad-nome').value.trim();
-      const usuario = document.getElementById('cad-user').value.trim();
       const senha = document.getElementById('cad-pass').value.trim();
-      if (!nome || !usuario || !senha) {
-        alert('Preencha todos os campos!');
+      const confirmar = document.getElementById('cad-confirmar').value.trim();
+      const cadastroMsg = document.getElementById('cadastro-msg');
+      cadastroMsg.textContent = '';
+      if (!nome || !senha || !confirmar) {
+        cadastroMsg.textContent = 'Preencha todos os campos!';
         return;
       }
-      const existe = await buscarUsuarioPorNome(usuario);
-      if (existe) {
-        alert('Usuário já existe!');
+      if (senha !== confirmar) {
+        cadastroMsg.textContent = 'As senhas não coincidem!';
         return;
       }
-      await cadastrarUsuario(nome, usuario, senha);
+      // Verifica se já existe usuário com esse nome
+      const existe = await db.collection('usuarios').where('nome', '==', nome).get();
+      if (!existe.empty) {
+        cadastroMsg.textContent = 'Nome já cadastrado!';
+        return;
+      }
+      await db.collection('usuarios').add({ nome, usuario: nome, senha, aprovado: false, admin: false });
       telaCadastro.classList.add('hidden');
       mostrarTelaAguarde();
     };
@@ -641,6 +685,7 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
       telaAdmin.classList.remove('hidden');
       adminBar.classList.remove('hidden');
       carregarSolicitacoes();
+      carregarUsuarios();
     }
 
     async function carregarSolicitacoes() {
@@ -735,11 +780,13 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
       // Pega os campos
       const local = document.getElementById('local').value;
       const pessoa = document.getElementById('pessoa').value;
-  const dataAtendimento = document.getElementById('data-atendimento').value;
+      const nomePeca = document.getElementById('nome-peca').value;
+      const numeroPeca = document.getElementById('numero-peca').value;
+      const dataAtendimento = document.getElementById('data-atendimento').value;
       const horaAtendimento = document.getElementById('hora-atendimento').value;
       const problema = document.getElementById('problema').value;
       const acao = document.getElementById('aqpc').value;
-      if (!local || !pessoa || !dataAtendimento || !horaAtendimento || !problema || !acao) {
+      if (!local || !pessoa || !nomePeca || !numeroPeca || !dataAtendimento || !horaAtendimento || !problema || !acao) {
         alert('Preencha todos os campos!');
         return;
       }
@@ -748,6 +795,8 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
         data: dataAtendimento,
         local,
         pessoa,
+        nomePeca,
+        numeroPeca,
         horaAtendimento,
         problema,
         acao,
@@ -844,20 +893,24 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
     recuperaMsg.textContent = '';
   };
   if (btnConfirmarRecupera) btnConfirmarRecupera.onclick = async function() {
-    const user = document.getElementById('recupera-user').value.trim();
     const nome = document.getElementById('recupera-nome').value.trim();
     const novaSenha = document.getElementById('recupera-nova-senha').value.trim();
-    if (!user || !nome || !novaSenha) {
+    const confirmar = document.getElementById('recupera-confirmar').value.trim();
+    recuperaMsg.textContent = '';
+    if (!nome || !novaSenha || !confirmar) {
       recuperaMsg.textContent = 'Preencha todos os campos!';
       return;
     }
+    if (novaSenha !== confirmar) {
+      recuperaMsg.textContent = 'As senhas não coincidem!';
+      return;
+    }
     const snap = await db.collection('usuarios')
-      .where('usuario', '==', user)
       .where('nome', '==', nome)
       .where('aprovado', '==', true)
       .get();
     if (snap.empty) {
-      recuperaMsg.textContent = 'Usuário não encontrado ou não aprovado.';
+      recuperaMsg.textContent = 'Nome não encontrado ou não aprovado.';
       return;
     }
     const id = snap.docs[0].id;

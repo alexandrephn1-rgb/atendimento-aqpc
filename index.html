@@ -405,41 +405,12 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
       <div id="lista-solicitacoes"></div>
       <h3 style="color:var(--primary);text-align:center;margin:24px 0 12px 0;">Usuários Cadastrados</h3>
       <div id="lista-usuarios"></div>
-        <div class="admin-approvals-bar">
-          <button id="btn-ir-formulario" class="btn btn-admin-approvals">Formulário</button>
-          <button id="btn-ir-pesquisa" class="btn btn-admin-approvals">Pesquisar</button>
-          <button id="btn-sair-admin" class="btn" style="background:#bdbdbd;color:#222;">Sair</button>
-        </div>
-  // Função para buscar todos os usuários aprovados (exceto admin fixo)
-  async function buscarUsuariosAprovados() {
-    const snap = await db.collection('usuarios').where('aprovado', '==', true).get();
-    return snap.docs
-      .map(doc => ({ id: doc.id, ...doc.data() }))
-      .filter(u => u.usuario !== 'Alexandre');
-  }
-
-  // Função para remover usuário
-  async function removerUsuario(id) {
-    if (!confirm('Tem certeza que deseja remover este usuário?')) return;
-    await db.collection('usuarios').doc(id).delete();
-    carregarUsuarios();
-  }
-
-  // Carregar lista de usuários aprovados
-  async function carregarUsuarios() {
-    const lista = await buscarUsuariosAprovados();
-    const listaDiv = document.getElementById('lista-usuarios');
-    if (!lista.length) {
-      listaDiv.innerHTML = '<em>Nenhum usuário cadastrado.</em>';
-      return;
-    }
-    listaDiv.innerHTML = lista.map(u => `
-      <div style="border:1px solid #ccc;border-radius:8px;padding:10px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
-        <span><b>Nome:</b> ${u.nome} <br><b>Usuário:</b> ${u.usuario}</span>
-        <button onclick="removerUsuario('${u.id}')" style="background:#e57373;color:#fff;border:none;border-radius:6px;padding:7px 14px;cursor:pointer;">Remover</button>
+      <div class="admin-approvals-bar">
+        <button id="btn-ir-formulario" class="btn btn-admin-approvals">Formulário</button>
+        <button id="btn-ir-pesquisa" class="btn btn-admin-approvals">Pesquisar</button>
+        <button id="btn-sair-admin" class="btn" style="background:#bdbdbd;color:#222;">Sair</button>
       </div>
-    `).join('');
-  }
+  <!-- Funções de usuários para admin serão inseridas no <script> -->
     </div>
   </div>
   <div id="tela-recuperar-senha" class="hidden card">
@@ -687,6 +658,43 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
       carregarSolicitacoes();
       carregarUsuarios();
     }
+  // Função para buscar todos os usuários aprovados (exceto admin fixo)
+  async function buscarUsuariosAprovados() {
+    const snap = await db.collection('usuarios').where('aprovado', '==', true).get();
+    return snap.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .filter(u => u.usuario !== 'Alexandre');
+  }
+
+  // Função para remover usuário
+  async function removerUsuario(id) {
+    if (!confirm('Tem certeza que deseja remover este usuário?')) return;
+    await db.collection('usuarios').doc(id).delete();
+    carregarUsuarios();
+  }
+
+  // Carregar lista de usuários aprovados
+  async function carregarUsuarios() {
+    const lista = await buscarUsuariosAprovados();
+    const listaDiv = document.getElementById('lista-usuarios');
+    if (!listaDiv) return;
+    if (!lista.length) {
+      listaDiv.innerHTML = '<em>Nenhum usuário cadastrado.</em>';
+      return;
+    }
+    listaDiv.innerHTML = lista.map(u => `
+      <div style="border:1px solid #ccc;border-radius:8px;padding:10px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+        <span><b>Nome:</b> ${u.nome} <br><b>Usuário:</b> ${u.usuario}</span>
+        <button class="btn-remover-usuario" data-id="${u.id}" style="background:#e57373;color:#fff;border:none;border-radius:6px;padding:7px 14px;cursor:pointer;">Remover</button>
+      </div>
+    `).join('');
+    // Adiciona evento aos botões
+    document.querySelectorAll('.btn-remover-usuario').forEach(btn => {
+      btn.onclick = function() {
+        removerUsuario(this.getAttribute('data-id'));
+      };
+    });
+  }
 
     async function carregarSolicitacoes() {
       const lista = await buscarSolicitacoesPendentes();

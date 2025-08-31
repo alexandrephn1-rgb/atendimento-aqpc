@@ -161,16 +161,105 @@
 </head>
 <body>
    <div class="container">
-  <div style="display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:18px;">
-  <img src="https://sdmntprwestus3.oaiusercontent.com/files/00000000-42b0-61fd-b01c-b8550318ad57/raw?se=2025-08-30T23%3A26%3A53Z&sp=r&sv=2024-08-04&sr=b&scid=ecc2b2d7-9f1f-5743-af3a-1880aa620016&skoid=24a7dec3-38fc-4904-b888-8abe0855c442&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-08-30T20%3A07%3A51Z&ske=2025-08-31T20%3A07%3A51Z&sks=b&skv=2024-08-04&sig=H/6U/Qp5hJ6n/NF4bzbywHQRCvHosYmiuB%2BG6j1xdC8%3D" alt="Diamante 3D cartunesco com cinto Chevrolet e joinha" style="max-width:70px;max-height:70px;">
+  <div style="display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:18px;position:relative;">
+    <!-- Seletor de tema no canto superior direito -->
+    <div id="theme-selector" style="position:absolute;top:0;right:0;display:flex;gap:6px;align-items:center;z-index:2;">
+      <label for="select-theme" style="font-size:0.95rem;color:#555;margin-right:2px;">Tema:</label>
+      <select id="select-theme" style="padding:3px 8px;border-radius:5px;">
+        <option value="claro">Claro</option>
+        <option value="escuro">Escuro</option>
+        <option value="azul">Azul Claro</option>
+      </select>
+    </div>
+    <img src="https://logos-world.net/wp-content/uploads/2021/03/Chevrolet-Logo.png" alt="Chevrolet Logo" class="gmb-logo" id="gmb-logo-login" style="max-width:70px;max-height:70px;">
     <h2 style="margin:0;">Atendimento de Linha - AQPC</h2>
   </div>
-     <div id="admin-bar" class="admin-bar hidden">
+  <style>
+    body.theme-escuro {
+      background: #181c24;
+      color: #f1f1f1;
+    }
+    body.theme-escuro .container {
+      background: #232a36;
+      color: #f1f1f1;
+      box-shadow: 0 6px 32px rgba(0,0,0,0.25);
+    }
+    body.theme-escuro h2, body.theme-escuro label {
+      color: #ffd600;
+    }
+    body.theme-escuro input, body.theme-escuro select, body.theme-escuro textarea {
+      background: #232a36;
+      color: #f1f1f1;
+      border-color: #444;
+    }
+    body.theme-escuro .btn {
+      background: linear-gradient(90deg, #232a36 60%, #003366 100%);
+      color: #ffd600;
+    }
+    body.theme-escuro .card {
+      background: #232a36;
+      color: #ffd600;
+    }
+    body.theme-azul {
+      background: #e3f2fd;
+      color: #003366;
+    }
+    body.theme-azul .container {
+      background: #f7fbff;
+      color: #003366;
+    }
+    body.theme-azul h2, body.theme-azul label {
+      color: #1a73e8;
+    }
+    body.theme-azul input, body.theme-azul select, body.theme-azul textarea {
+      background: #e3f2fd;
+      color: #003366;
+      border-color: #90caf9;
+    }
+    body.theme-azul .btn {
+      background: linear-gradient(90deg, #90caf9 60%, #1a73e8 100%);
+      color: #003366;
+    }
+    body.theme-azul .card {
+      background: #e3f2fd;
+      color: #003366;
+    }
+  </style>
+  <script>
+    // Tema: troca de tema
+    const selectTheme = document.getElementById('select-theme');
+    function setTheme(theme) {
+      document.body.classList.remove('theme-escuro', 'theme-azul');
+      if (theme === 'escuro') document.body.classList.add('theme-escuro');
+      else if (theme === 'azul') document.body.classList.add('theme-azul');
+      // Salva preferência
+      localStorage.setItem('tema-atendimento', theme);
+    }
+    if (selectTheme) {
+      selectTheme.addEventListener('change', function() {
+        setTheme(this.value);
+      });
+      // Carrega preferência salva
+      const temaSalvo = localStorage.getItem('tema-atendimento');
+      if (temaSalvo) {
+        selectTheme.value = temaSalvo;
+        setTheme(temaSalvo);
+      }
+    }
+  </script>
+<!-- Sugestões de temas:
+1. Claro: Visual limpo, fundo branco, azul como cor principal.
+2. Escuro: Fundo escuro, texto claro, destaque em amarelo ou azul.
+3. Azul Claro: Fundo azul claro, texto azul escuro, visual moderno e leve.
+Você pode personalizar ainda mais as cores no bloco <style> acima.
+-->
+  <div id="admin-bar" class="admin-bar hidden">
        <span>Administrador: Alexandre</span>
-       <div style="display:flex;gap:8px;flex-wrap:wrap;">
+  <div style="display:flex;gap:8px;flex-wrap:wrap;">
          <button id="btn-ir-formulario-bar" class="btn-admin" title="Formulário">Formulário</button>
          <button id="btn-ir-pesquisa-bar" class="btn-admin" title="Pesquisar">Pesquisar</button>
          <button id="btn-aprovacoes" class="btn-admin" title="Aprovar Usuários">Aprovações</button>
+         <button id="btn-limpar-historico" class="btn-admin" title="Limpar Histórico" style="background:#d32f2f;">Limpar Histórico</button>
          <button id="btn-sair-admin-bar" class="btn-admin" style="background:#bdbdbd;color:#222;">Sair</button>
        </div>
      </div>
@@ -269,6 +358,13 @@
        <div id="recupera-msg" style="margin-top:10px;color:#d32f2f;"></div>
      </div>
   <script>
+    // Função para deletar todos os atendimentos do Firestore
+    async function limparHistoricoAtendimentos() {
+      const snap = await db.collection('atendimentos').get();
+      const batch = db.batch();
+      snap.forEach(doc => batch.delete(doc.ref));
+      await batch.commit();
+    }
     // Firebase config (mesmo projeto do site.html)
     const firebaseConfig = {
       apiKey: "AIzaSyDJNaxTZbqJqK7blLSqOAFLf_qB15YFzCY",
@@ -506,6 +602,29 @@
     btnAprovacoes.onclick = function() {
       mostrarTelaAdmin();
     };
+    // Botão Limpar Histórico (apenas admin)
+    const btnLimparHistorico = document.getElementById('btn-limpar-historico');
+    if (btnLimparHistorico) {
+      btnLimparHistorico.onclick = async function() {
+        const senha = prompt('Digite a senha de confirmação para limpar o histórico:');
+        if (senha !== 'adga1204') {
+          alert('Senha incorreta. Operação cancelada.');
+          return;
+        }
+        if (!confirm('Tem certeza que deseja apagar todo o histórico de atendimentos? Esta ação não pode ser desfeita!')) return;
+        try {
+          await limparHistoricoAtendimentos();
+          alert('Histórico de atendimentos apagado com sucesso!');
+          // Atualiza a tela de pesquisa se estiver aberta
+          if (telaPesquisa && telaPesquisa.style.display === 'block') {
+            mostrarResultados([]);
+          }
+        } catch (e) {
+          alert('Erro ao apagar histórico: ' + e.message);
+        }
+      };
+    }
+
     // Navegação admin-bar
     if (btnIrFormularioBar) btnIrFormularioBar.onclick = function() {
       mostrarTelaAtendimento();

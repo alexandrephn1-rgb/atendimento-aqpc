@@ -638,6 +638,7 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
       btnPesquisar.classList.remove('hidden');
       resultado.classList.add('hidden');
       form.reset();
+      // Apenas admin vê adminBar
       if (usuarioLogado && usuarioLogado.admin) {
         adminBar.classList.remove('hidden');
       } else {
@@ -653,10 +654,16 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
       btnPesquisar.classList.add('hidden');
       telaPesquisa.style.display = 'none';
       resultado.classList.add('hidden');
-      telaAdmin.classList.remove('hidden');
-      adminBar.classList.remove('hidden');
-      carregarSolicitacoes();
-      carregarUsuarios();
+      // Só mostra tela admin se for admin
+      if (usuarioLogado && usuarioLogado.admin) {
+        telaAdmin.classList.remove('hidden');
+        adminBar.classList.remove('hidden');
+        carregarSolicitacoes();
+        carregarUsuarios();
+      } else {
+        telaAdmin.classList.add('hidden');
+        adminBar.classList.add('hidden');
+      }
     }
   // Função para buscar todos os usuários aprovados (exceto admin fixo)
   async function buscarUsuariosAprovados() {
@@ -798,6 +805,19 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
         alert('Preencha todos os campos!');
         return;
       }
+      // Calcular tempo de atendimento (data + hora)
+      const dataHora = dataAtendimento + 'T' + horaAtendimento;
+      const dataHoraObj = new Date(dataHora);
+      const agora = new Date();
+      let tempo = '';
+      if (!isNaN(dataHoraObj.getTime())) {
+        const diffMs = agora - dataHoraObj;
+        if (diffMs > 0) {
+          const min = Math.floor(diffMs / 60000);
+          const seg = Math.floor((diffMs % 60000) / 1000);
+          tempo = `${min} min ${seg} s`;
+        }
+      }
       // Salva atendimento
       const atendimento = {
         data: dataAtendimento,
@@ -808,14 +828,20 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
         horaAtendimento,
         problema,
         acao,
-        usuario: usuarioLogado ? usuarioLogado.usuario : ''
+        usuario: usuarioLogado ? usuarioLogado.usuario : '',
+        tempo
       };
       await salvarAtendimento(atendimento);
       // Mostra resultado na tela de pesquisa
       telaPesquisa.style.display = 'block';
       form.classList.add('hidden');
       btnPesquisar.classList.remove('hidden');
-      adminBar.classList.remove('hidden');
+      // Só mostra adminBar se for admin
+      if (usuarioLogado && usuarioLogado.admin) {
+        adminBar.classList.remove('hidden');
+      } else {
+        adminBar.classList.add('hidden');
+      }
       telaAdmin.classList.add('hidden');
       resultado.classList.add('hidden');
       // Mostra o atendimento recém cadastrado no topo

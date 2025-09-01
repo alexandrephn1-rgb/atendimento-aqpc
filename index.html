@@ -190,7 +190,38 @@
   </style>
 </head>
 <body>
-   <div class="container">
+  <div id="tela-entrada" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;background:linear-gradient(135deg,#1a73e8 0%,#003366 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;animation:fadeIn 1s;">
+    <div style="display:flex;flex-direction:column;align-items:center;">
+      <img src="https://logos-world.net/wp-content/uploads/2021/03/Chevrolet-Logo.png" alt="Chevrolet Logo" style="width:120px;height:auto;margin-bottom:24px;filter:drop-shadow(0 4px 24px #0008);animation:logoPop 1.2s cubic-bezier(.68,-0.55,.27,1.55);">
+  <h1 style="color:#fff;font-size:2.2rem;letter-spacing:2px;font-family:'Montserrat',Arial,sans-serif;text-shadow:0 2px 16px #003366a0;animation:titleFade 1.2s 0.2s both;">Atendimento AQPC - DIESEL</h1>
+      <div class="loader-modern" style="margin:38px auto 0 auto;"></div>
+    </div>
+  </div>
+  <style>
+    @keyframes logoPop {
+      0% { transform: scale(0.7) rotate(-10deg); opacity:0; }
+      60% { transform: scale(1.15) rotate(6deg); opacity:1; }
+      100% { transform: scale(1) rotate(0deg); opacity:1; }
+    }
+    @keyframes titleFade {
+      0% { opacity:0; transform:translateY(30px); }
+      100% { opacity:1; transform:translateY(0); }
+    }
+    .loader-modern {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 6px solid #fff3;
+      border-top: 6px solid #ffd600;
+      animation: spin 1.1s linear infinite;
+      box-shadow: 0 2px 16px #00336644;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+  <div class="container">
   <div class="theme-switch" style="position:fixed;top:18px;right:24px;z-index:100;">
     <button class="theme-btn" id="light-theme" title="Tema Claro">🌞</button>
     <button class="theme-btn" id="dark-theme" title="Tema Escuro">🌙</button>
@@ -891,22 +922,58 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
         resultadosPesquisa.innerHTML = '<em>Nenhum atendimento encontrado.</em>';
         return;
       }
-      resultadosPesquisa.innerHTML = lista.map(a => `
+      resultadosPesquisa.innerHTML = lista.map(a => {
+        // Mostra Inspetor de Qualidade
+        let inspetor = a.pessoa || '';
+        // Data/hora de início e final
+        let dataInicio = a.data;
+        let horaInicio = a.horaAtendimento || '';
+        // Data/hora de finalização (data/hora do registro)
+        let dataFinal = '';
+        let horaFinal = '';
+        // Tenta obter data/hora de finalização do campo "tempo" (calculado no submit)
+        // Se não houver, usa data/hora atual
+        let dataFinalObj = new Date();
+        if (a.data && a.horaAtendimento) {
+          // Se o tempo foi calculado, tenta estimar data final
+          // (não há campo explícito, então só mostra se data for diferente)
+          const dataHoraInicio = new Date(a.data + 'T' + a.horaAtendimento);
+          // Se a data de início for diferente da data de finalização (hoje)
+          const hoje = new Date();
+          const dataHojeStr = hoje.toISOString().slice(0,10);
+          if (a.data !== dataHojeStr) {
+            dataFinal = dataHojeStr;
+            horaFinal = hoje.toTimeString().slice(0,5);
+          }
+        }
+        let tempoStr = `<b>Tempo:</b> ${a.tempo || ''}`;
+        // Se data de início diferente da final, mostra datas
+        let datasExtra = '';
+        if (dataFinal && dataInicio !== dataFinal) {
+          datasExtra = `<br><b>Data/Hora Início:</b> ${dataInicio} ${horaInicio}<br><b>Data/Hora Final:</b> ${dataFinal} ${horaFinal}`;
+        }
+        return `
         <div style="border:1px solid #ccc;border-radius:8px;padding:10px;margin-bottom:10px;">
           <b>Data:</b> ${a.data}<br>
           <b>Departamento:</b> ${a.local}<br>
+          <b>Inspetor de Qualidade:</b> ${inspetor}<br>
+          <b>Nome da Peça:</b> ${a.nomePeca || ''}<br>
+          <b>Número da Peça:</b> ${a.numeroPeca || ''}<br>
           <b>Data do Atendimento:</b> ${a.data}<br>
           <b>Descrição do Problema:</b> ${a.problema}<br>
-          <b>Ação Tomada:</b> ${a.acao}<br>
-          <b>Tempo:</b> ${a.tempo}<br>
-          <b>Usuário:</b> ${a.usuario || ''}
+          <b>Ação da Qualidade:</b> ${a.acao}<br>
+          ${tempoStr}
+          ${datasExtra}
         </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     // Inicialização: mostrar tela de login
     window.onload = function() {
-      telaLogin.classList.remove('hidden');
+      // Mostra tela de entrada animada
+      document.getElementById('tela-entrada').style.display = 'flex';
+      telaLogin.classList.add('hidden');
       telaCadastro.classList.add('hidden');
       telaAguarde.classList.add('hidden');
       form.classList.add('hidden');
@@ -914,7 +981,15 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
       telaAdmin.classList.add('hidden');
       telaPesquisa.style.display = 'none';
       adminBar.classList.add('hidden');
-      document.getElementById('btn-sair-form').style.display = 'block';
+      // Esconde tela de entrada e mostra login após animação (3 segundos)
+      setTimeout(() => {
+        document.getElementById('tela-entrada').style.opacity = '0';
+        setTimeout(() => {
+          document.getElementById('tela-entrada').style.display = 'none';
+          telaLogin.classList.remove('hidden');
+          document.getElementById('btn-sair-form').style.display = 'block';
+        }, 600);
+      }, 3000);
     };
     if (btnRecuperarSenha) btnRecuperarSenha.onclick = function() {
     telaLogin.classList.add('hidden');

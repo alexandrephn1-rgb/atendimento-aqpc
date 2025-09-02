@@ -190,35 +190,38 @@
   </style>
 </head>
 <body>
-  <div id="tela-entrada" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;background:linear-gradient(135deg,#1a73e8 0%,#003366 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;animation:fadeIn 1s;">
-    <div style="display:flex;flex-direction:column;align-items:center;">
-      <img src="https://logos-world.net/wp-content/uploads/2021/03/Chevrolet-Logo.png" alt="Chevrolet Logo" style="width:120px;height:auto;margin-bottom:24px;filter:drop-shadow(0 4px 24px #0008);animation:logoPop 1.2s cubic-bezier(.68,-0.55,.27,1.55);">
-  <h1 style="color:#fff;font-size:2.2rem;letter-spacing:2px;font-family:'Montserrat',Arial,sans-serif;text-shadow:0 2px 16px #003366a0;animation:titleFade 1.2s 0.2s both;">Atendimento AQPC - DIESEL</h1>
-      <div class="loader-modern" style="margin:38px auto 0 auto;"></div>
+  <!-- Splash Screen -->
+  <div id="splash-screen" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;background:linear-gradient(135deg,#1a73e8 60%,#ffd600 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;animation:fadeIn 1s;">
+    <img src="https://logos-world.net/wp-content/uploads/2021/03/Chevrolet-Logo.png" alt="Logo" style="width:160px;height:auto;margin-bottom:32px;filter:drop-shadow(0 4px 24px #00336688);">
+    <h1 style="color:#fff;font-size:2.5rem;font-family:'Montserrat',Arial,sans-serif;text-shadow:2px 2px 12px #003366b0,0 0 0 #ffd600;font-weight:900;letter-spacing:2px;margin-bottom:18px;text-align:center;">Bem-vindo ao AQPC DIESEL</h1>
+    <div style="background:rgba(255,255,255,0.92);border-radius:18px;padding:22px 32px;box-shadow:0 8px 32px #00336633;max-width:90vw;">
+      <h2 style="color:#1a73e8;font-size:1.3rem;margin:0 0 10px 0;font-weight:700;text-align:center;">O compromisso com a qualidade é evidenciado pela exigência de excelência de seus fornecedores.</h2>
+    </div>
+    <div style="margin-top:38px;text-align:center;">
+      <span style="color:#fff;font-size:1.1rem;font-weight:600;letter-spacing:1px;">Carregando aplicativo...</span>
+      <div style="margin-top:16px;">
+        <div style="width:60px;height:60px;border:7px solid #fff;border-top:7px solid #ffd600;border-radius:50%;animation:spin 1.1s linear infinite;margin:0 auto;"></div>
+      </div>
     </div>
   </div>
   <style>
-    @keyframes logoPop {
-      0% { transform: scale(0.7) rotate(-10deg); opacity:0; }
-      60% { transform: scale(1.15) rotate(6deg); opacity:1; }
-      100% { transform: scale(1) rotate(0deg); opacity:1; }
-    }
-    @keyframes titleFade {
-      0% { opacity:0; transform:translateY(30px); }
-      100% { opacity:1; transform:translateY(0); }
-    }
-    .loader-modern {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      border: 6px solid #fff3;
-      border-top: 6px solid #ffd600;
-      animation: spin 1.1s linear infinite;
-      box-shadow: 0 2px 16px #00336644;
-    }
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
+    }
+    #splash-screen h1 {
+      animation: splashTitle 1.2s cubic-bezier(.68,-0.55,.27,1.55);
+    }
+    @keyframes splashTitle {
+      0% { opacity:0; transform:scale(0.7) translateY(40px); }
+      100% { opacity:1; transform:scale(1) translateY(0); }
+    }
+    #splash-screen img {
+      animation: splashLogo 1.2s cubic-bezier(.68,-0.55,.27,1.55);
+    }
+    @keyframes splashLogo {
+      0% { opacity:0; transform:scale(0.5) rotate(-30deg); }
+      100% { opacity:1; transform:scale(1) rotate(0deg); }
     }
   </style>
   <div class="container">
@@ -321,6 +324,17 @@
     }
   </style>
   <script>
+    // Splash screen logic
+    window.addEventListener('DOMContentLoaded', function() {
+      var splash = document.getElementById('splash-screen');
+      var mainContent = document.querySelector('.container');
+      // Esconde tudo exceto splash
+      if (mainContent) mainContent.style.display = 'none';
+      setTimeout(function() {
+        if (splash) splash.style.display = 'none';
+        if (mainContent) mainContent.style.display = '';
+      }, 7000);
+    });
     // Temas
     const html = document.documentElement;
     const btnLight = document.getElementById('light-theme');
@@ -367,9 +381,24 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
          <option>Usinagem Cabeçote</option>
          <option>MVA S10</option>
        </select>
-       <button id="btn-filtrar" class="btn" style="margin-top:10px;">Filtrar</button>
-       <button id="btn-voltar-login-pesquisa" class="btn" style="background:#bdbdbd;color:#222;margin-top:10px;">Sair</button>
+       <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;">
+         <button id="btn-filtrar" class="btn" style="flex:1;min-width:120px;">Filtrar</button>
+         <button id="btn-relatorios" class="btn" style="background:#ffd600;color:#222;flex:1;min-width:120px;font-weight:700;">Relatórios</button>
+         <button id="btn-voltar-login-pesquisa" class="btn" style="background:#bdbdbd;color:#222;flex:1;min-width:120px;">Sair</button>
+       </div>
        <div id="resultados-pesquisa" style="margin-top:18px;"></div>
+     </div>
+     <!-- Tela de Relatórios -->
+     <div id="tela-relatorios" class="hidden card" style="max-width:700px;margin:40px auto 0 auto;">
+       <h3 style="color:var(--primary);text-align:center;margin-bottom:18px;">Relatório de Atendimentos do Dia</h3>
+       <div style="display:flex;gap:18px;flex-wrap:wrap;justify-content:center;align-items:center;margin-bottom:18px;">
+         <label for="relatorio-data" style="margin:0;">Data:</label>
+         <input type="date" id="relatorio-data" style="max-width:180px;">
+         <label for="relatorio-usuario" style="margin:0;">Usuário:</label>
+         <select id="relatorio-usuario" style="max-width:180px;"><option value="">Todos</option></select>
+       </div>
+       <div id="relatorio-resultados" style="margin-bottom:18px;"></div>
+       <button id="btn-voltar-relatorio" class="btn" style="background:#bdbdbd;color:#222;max-width:200px;margin:0 auto;display:block;">Voltar</button>
      </div>
      <!-- Fim tela de pesquisa -->
      <!-- Tela de login/cadastro -->
@@ -457,6 +486,146 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
        <div id="recupera-msg" style="margin-top:10px;color:#d32f2f;"></div>
      </div>
   <script>
+    // --- Relatórios ---
+    const btnRelatorios = document.getElementById('btn-relatorios');
+    const telaRelatorios = document.getElementById('tela-relatorios');
+    const relatorioData = document.getElementById('relatorio-data');
+    const relatorioUsuario = document.getElementById('relatorio-usuario');
+    const relatorioResultados = document.getElementById('relatorio-resultados');
+    const btnVoltarRelatorio = document.getElementById('btn-voltar-relatorio');
+    // Helper para determinar turno
+    function getTurno(hora) {
+      if (!hora) return 'Indefinido';
+      const [h, m] = hora.split(':').map(Number);
+      const minutos = h * 60 + m;
+      if (minutos >= 350 && minutos < 905) return '1º Turno'; // 5:50 - 15:05
+      if (minutos >= 905 && minutos < 1440) return '2º Turno'; // 15:05 - 00:00
+      if (minutos < 360) return '3º Turno'; // 00:00 - 6:00
+      return 'Indefinido';
+    }
+    // Preencher usuários no filtro
+    async function preencherUsuariosRelatorio(data) {
+      relatorioUsuario.innerHTML = '<option value="">Todos</option>';
+      let ref = db.collection('atendimentos');
+      if (data) ref = ref.where('data', '==', data);
+      const snap = await ref.get();
+      const usuarios = [...new Set(snap.docs.map(doc => doc.data().usuario).filter(Boolean))];
+      usuarios.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u;
+        opt.textContent = u;
+        relatorioUsuario.appendChild(opt);
+      });
+    }
+    // Calcular diferença em minutos entre dois horários (hh:mm)
+    function diffMinutos(hora1, hora2) {
+      if (!hora1 || !hora2) return 0;
+      const [h1, m1] = hora1.split(":").map(Number);
+      const [h2, m2] = hora2.split(":").map(Number);
+      let t1 = h1 * 60 + m1;
+      let t2 = h2 * 60 + m2;
+      // Se cruzar a meia-noite
+      if (t2 < t1) t2 += 24 * 60;
+      return t2 - t1;
+    }
+
+    // Calcular relatório
+    async function gerarRelatorio() {
+      const data = relatorioData.value;
+      const usuarioFiltro = relatorioUsuario.value;
+      let ref = db.collection('atendimentos');
+      if (data) ref = ref.where('data', '==', data);
+      const snap = await ref.get();
+      let atendimentos = snap.docs.map(doc => doc.data());
+      if (usuarioFiltro) atendimentos = atendimentos.filter(a => a.usuario === usuarioFiltro);
+      // Agrupar por usuário e turno
+      const usuarios = {};
+      let totalAtend = 0;
+      let totalMinutos = 0;
+      // Agrupar atendimentos por usuário e ordenar por hora
+      const atendPorUsuario = {};
+      atendimentos.forEach(a => {
+        const user = a.usuario || 'Desconhecido';
+        if (!atendPorUsuario[user]) atendPorUsuario[user] = [];
+        atendPorUsuario[user].push(a);
+      });
+      // Para cada usuário, somar apenas o tempo gasto em cada atendimento (campo 'tempo' em minutos)
+      Object.entries(atendPorUsuario).forEach(([user, lista]) => {
+        let minUser = 0;
+        const turnos = {};
+        lista.forEach((a) => {
+          let min = 0;
+          if (a.tempo) {
+            // Se vier como string tipo '1h 30min' ou '90', converter
+            if (typeof a.tempo === 'string') {
+              const match = a.tempo.match(/(\d+)h\s*(\d+)?/);
+              if (match) {
+                min = parseInt(match[1],10)*60 + (match[2]?parseInt(match[2],10):0);
+              } else if (!isNaN(Number(a.tempo))) {
+                min = Number(a.tempo);
+              } else {
+                // Tenta pegar só minutos
+                const minMatch = a.tempo.match(/(\d+)\s*min/);
+                if (minMatch) min = parseInt(minMatch[1],10);
+              }
+            } else if (typeof a.tempo === 'number') {
+              min = a.tempo;
+            }
+          }
+          // Só soma se houver valor válido em tempo
+          if (min && min > 0) {
+            minUser += min;
+            const turno = getTurno(a.horaAtendimento);
+            if (!turnos[turno]) turnos[turno] = { total: 0, minutos: 0 };
+            turnos[turno].total++;
+            turnos[turno].minutos += min;
+            totalAtend++;
+          }
+        });
+        totalMinutos += minUser;
+        usuarios[user] = {
+          total: Object.values(turnos).reduce((acc, t) => acc + t.total, 0),
+          minutos: minUser,
+          turnos: turnos
+        };
+      });
+      // Montar HTML
+      function minToHhmm(min) {
+        const h = Math.floor(min / 60);
+        const m = min % 60;
+        return `${h}h${m > 0 ? ' ' + m + 'min' : ''}`;
+      }
+      let html = `<div style="margin-bottom:12px;"><b>Total de Atendimentos:</b> ${totalAtend} &nbsp; | &nbsp; <b>Carga Horária Total:</b> ${minToHhmm(totalMinutos)}</div>`;
+      Object.entries(usuarios).forEach(([user, info]) => {
+        html += `<div style="border:1.5px solid #cfd8dc;border-radius:10px;padding:12px;margin-bottom:10px;background:var(--section);">
+          <b>Usuário:</b> ${user}<br>
+          <b>Atendimentos:</b> ${info.total} &nbsp; | &nbsp; <b>Carga Horária:</b> ${minToHhmm(info.minutos)}<br>
+          <b>Por Turno:</b><ul style="margin:6px 0 0 18px;">`;
+        Object.entries(info.turnos).forEach(([turno, tinfo]) => {
+          html += `<li><b>${turno}:</b> ${tinfo.total} atendimentos, ${minToHhmm(tinfo.minutos)}</li>`;
+        });
+        html += '</ul></div>';
+      });
+      if (!totalAtend) html = '<em>Nenhum atendimento encontrado para o filtro.</em>';
+      relatorioResultados.innerHTML = html;
+    }
+    // Eventos
+    if (btnRelatorios) btnRelatorios.onclick = async function() {
+      document.getElementById('tela-pesquisa').style.display = 'none';
+      telaRelatorios.classList.remove('hidden');
+      relatorioData.value = document.getElementById('filtro-data').value;
+      await preencherUsuariosRelatorio(relatorioData.value);
+      await gerarRelatorio();
+    };
+    if (btnVoltarRelatorio) btnVoltarRelatorio.onclick = function() {
+      telaRelatorios.classList.add('hidden');
+      document.getElementById('tela-pesquisa').style.display = 'block';
+    };
+    if (relatorioData) relatorioData.onchange = async function() {
+      await preencherUsuariosRelatorio(relatorioData.value);
+      await gerarRelatorio();
+    };
+    if (relatorioUsuario) relatorioUsuario.onchange = gerarRelatorio;
     // Função para deletar todos os atendimentos do Firestore
     async function limparHistoricoAtendimentos() {
       const snap = await db.collection('atendimentos').get();
@@ -669,7 +838,6 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
       btnPesquisar.classList.remove('hidden');
       resultado.classList.add('hidden');
       form.reset();
-      // Apenas admin vê adminBar
       if (usuarioLogado && usuarioLogado.admin) {
         adminBar.classList.remove('hidden');
       } else {
@@ -685,16 +853,10 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
       btnPesquisar.classList.add('hidden');
       telaPesquisa.style.display = 'none';
       resultado.classList.add('hidden');
-      // Só mostra tela admin se for admin
-      if (usuarioLogado && usuarioLogado.admin) {
-        telaAdmin.classList.remove('hidden');
-        adminBar.classList.remove('hidden');
-        carregarSolicitacoes();
-        carregarUsuarios();
-      } else {
-        telaAdmin.classList.add('hidden');
-        adminBar.classList.add('hidden');
-      }
+      telaAdmin.classList.remove('hidden');
+      adminBar.classList.remove('hidden');
+      carregarSolicitacoes();
+      carregarUsuarios();
     }
   // Função para buscar todos os usuários aprovados (exceto admin fixo)
   async function buscarUsuariosAprovados() {
@@ -836,19 +998,6 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
         alert('Preencha todos os campos!');
         return;
       }
-      // Calcular tempo de atendimento (data + hora)
-      const dataHora = dataAtendimento + 'T' + horaAtendimento;
-      const dataHoraObj = new Date(dataHora);
-      const agora = new Date();
-      let tempo = '';
-      if (!isNaN(dataHoraObj.getTime())) {
-        const diffMs = agora - dataHoraObj;
-        if (diffMs > 0) {
-          const min = Math.floor(diffMs / 60000);
-          const seg = Math.floor((diffMs % 60000) / 1000);
-          tempo = `${min} min ${seg} s`;
-        }
-      }
       // Salva atendimento
       const atendimento = {
         data: dataAtendimento,
@@ -859,20 +1008,14 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
         horaAtendimento,
         problema,
         acao,
-        usuario: usuarioLogado ? usuarioLogado.usuario : '',
-        tempo
+        usuario: usuarioLogado ? usuarioLogado.usuario : ''
       };
       await salvarAtendimento(atendimento);
       // Mostra resultado na tela de pesquisa
       telaPesquisa.style.display = 'block';
       form.classList.add('hidden');
       btnPesquisar.classList.remove('hidden');
-      // Só mostra adminBar se for admin
-      if (usuarioLogado && usuarioLogado.admin) {
-        adminBar.classList.remove('hidden');
-      } else {
-        adminBar.classList.add('hidden');
-      }
+      adminBar.classList.remove('hidden');
       telaAdmin.classList.add('hidden');
       resultado.classList.add('hidden');
       // Mostra o atendimento recém cadastrado no topo
@@ -922,74 +1065,77 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
         resultadosPesquisa.innerHTML = '<em>Nenhum atendimento encontrado.</em>';
         return;
       }
-      resultadosPesquisa.innerHTML = lista.map(a => {
-        // Mostra Inspetor de Qualidade
-        let inspetor = a.pessoa || '';
-        // Data/hora de início e final
-        let dataInicio = a.data;
-        let horaInicio = a.horaAtendimento || '';
-        // Data/hora de finalização (data/hora do registro)
-        let dataFinal = '';
-        let horaFinal = '';
-        // Tenta obter data/hora de finalização do campo "tempo" (calculado no submit)
-        // Se não houver, usa data/hora atual
-        let dataFinalObj = new Date();
-        if (a.data && a.horaAtendimento) {
-          // Se o tempo foi calculado, tenta estimar data final
-          // (não há campo explícito, então só mostra se data for diferente)
-          const dataHoraInicio = new Date(a.data + 'T' + a.horaAtendimento);
-          // Se a data de início for diferente da data de finalização (hoje)
-          const hoje = new Date();
-          const dataHojeStr = hoje.toISOString().slice(0,10);
-          if (a.data !== dataHojeStr) {
-            dataFinal = dataHojeStr;
-            horaFinal = hoje.toTimeString().slice(0,5);
-          }
-        }
-        let tempoStr = `<b>Tempo:</b> ${a.tempo || ''}`;
-        // Se data de início diferente da final, mostra datas
-        let datasExtra = '';
-        if (dataFinal && dataInicio !== dataFinal) {
-          datasExtra = `<br><b>Data/Hora Início:</b> ${dataInicio} ${horaInicio}<br><b>Data/Hora Final:</b> ${dataFinal} ${horaFinal}`;
+      resultadosPesquisa.innerHTML = lista.map((a, idx) => {
+        // Só mostra botão de deletar para admin
+        let btnDelete = '';
+        if (usuarioLogado && usuarioLogado.admin) {
+          btnDelete = `<button class="btn-excluir-atendimento" data-idx="${idx}" style="background:#e57373;color:#fff;border:none;border-radius:6px;padding:7px 14px;cursor:pointer;margin-top:8px;">Excluir</button>`;
         }
         return `
-        <div style="border:1px solid #ccc;border-radius:8px;padding:10px;margin-bottom:10px;">
+        <div class="atendimento-item" style="border:1px solid #ccc;border-radius:8px;padding:10px;margin-bottom:10px;">
           <b>Data:</b> ${a.data}<br>
           <b>Departamento:</b> ${a.local}<br>
-          <b>Inspetor de Qualidade:</b> ${inspetor}<br>
-          <b>Nome da Peça:</b> ${a.nomePeca || ''}<br>
-          <b>Número da Peça:</b> ${a.numeroPeca || ''}<br>
           <b>Data do Atendimento:</b> ${a.data}<br>
           <b>Descrição do Problema:</b> ${a.problema}<br>
-          <b>Ação da Qualidade:</b> ${a.acao}<br>
-          ${tempoStr}
-          ${datasExtra}
+          <b>Ação Tomada:</b> ${a.acao}<br>
+          <b>Tempo:</b> ${a.tempo}<br>
+          <b>Usuário:</b> ${a.usuario || ''}<br>
+          ${(usuarioLogado && usuarioLogado.admin) ? btnDelete : ''}
         </div>
         `;
       }).join('');
+      // Adiciona eventos aos botões de excluir
+      if (usuarioLogado && usuarioLogado.admin) {
+        document.querySelectorAll('.btn-excluir-atendimento').forEach(btn => {
+          btn.onclick = async function() {
+            const idx = this.getAttribute('data-idx');
+            const atendimento = lista[idx];
+            const senha = prompt('Digite a senha de confirmação para excluir este atendimento:');
+            if (senha !== 'adga1204') {
+              alert('Senha incorreta. Operação cancelada.');
+              return;
+            }
+            if (!confirm('Tem certeza que deseja excluir este atendimento?')) return;
+            // Excluir do Firestore
+            // Busca pelo atendimento exato (data, usuario, horaAtendimento, problema, acao, etc)
+            const snap = await db.collection('atendimentos')
+              .where('data', '==', atendimento.data)
+              .where('usuario', '==', atendimento.usuario)
+              .where('horaAtendimento', '==', atendimento.horaAtendimento)
+              .where('problema', '==', atendimento.problema)
+              .where('acao', '==', atendimento.acao)
+              .get();
+            if (!snap.empty) {
+              await db.collection('atendimentos').doc(snap.docs[0].id).delete();
+              alert('Atendimento excluído com sucesso!');
+              // Atualiza a lista
+              const novaLista = await buscarAtendimentos(
+                document.getElementById('filtro-data').value,
+                document.getElementById('filtro-depto').value
+              );
+              mostrarResultados(novaLista);
+            } else {
+              alert('Não foi possível encontrar o atendimento para exclusão.');
+            }
+          };
+        });
+      }
     }
 
     // Inicialização: mostrar tela de login
     window.onload = function() {
-      // Mostra tela de entrada animada
-      document.getElementById('tela-entrada').style.display = 'flex';
-      telaLogin.classList.add('hidden');
-      telaCadastro.classList.add('hidden');
-      telaAguarde.classList.add('hidden');
-      form.classList.add('hidden');
-      btnPesquisar.classList.add('hidden');
-      telaAdmin.classList.add('hidden');
-      telaPesquisa.style.display = 'none';
-      adminBar.classList.add('hidden');
-      // Esconde tela de entrada e mostra login após animação (3 segundos)
-      setTimeout(() => {
-        document.getElementById('tela-entrada').style.opacity = '0';
-        setTimeout(() => {
-          document.getElementById('tela-entrada').style.display = 'none';
-          telaLogin.classList.remove('hidden');
-          document.getElementById('btn-sair-form').style.display = 'block';
-        }, 600);
-      }, 3000);
+      // Só mostra tela de login após splash
+      setTimeout(function() {
+        telaLogin.classList.remove('hidden');
+        telaCadastro.classList.add('hidden');
+        telaAguarde.classList.add('hidden');
+        form.classList.add('hidden');
+        btnPesquisar.classList.add('hidden');
+        telaAdmin.classList.add('hidden');
+        telaPesquisa.style.display = 'none';
+        adminBar.classList.add('hidden');
+        document.getElementById('btn-sair-form').style.display = 'block';
+      }, 7000);
     };
     if (btnRecuperarSenha) btnRecuperarSenha.onclick = function() {
     telaLogin.classList.add('hidden');

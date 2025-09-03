@@ -69,9 +69,13 @@
       background: var(--card);
       border-radius: 18px;
       box-shadow: var(--shadow);
-      padding: 38px 32px 28px 32px;
+      margin-bottom: 8px;
       position: relative;
       animation: fadeIn 0.7s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(30px);}
@@ -120,6 +124,9 @@
     }
     input[type="text"], input[type="password"], input[type="time"], select, textarea {
       width: 100%;
+      min-width: 180px;
+      max-width: 350px;
+      box-sizing: border-box;
       padding: 10px 12px;
       margin-bottom: 12px;
       border: 1.5px solid var(--border);
@@ -141,6 +148,9 @@
     }
     .btn {
       width: 100%;
+      min-width: 180px;
+      max-width: 350px;
+      box-sizing: border-box;
       padding: 12px;
       background: linear-gradient(90deg, var(--primary) 60%, var(--primary-dark) 100%);
       color: #fff;
@@ -224,7 +234,7 @@
       100% { opacity:1; transform:scale(1) rotate(0deg); }
     }
   </style>
-  <div class="container">
+  <div class="container" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
   <div class="theme-switch" style="position:fixed;top:18px;right:24px;z-index:100;">
     <button class="theme-btn" id="light-theme" title="Tema Claro">🌞</button>
     <button class="theme-btn" id="dark-theme" title="Tema Escuro">🌙</button>
@@ -358,16 +368,17 @@
 3. Azul Claro: Fundo azul claro, texto azul escuro, visual moderno e leve.
 Você pode personalizar ainda mais as cores no bloco <style> acima.
 -->
-  <div id="admin-bar" class="admin-bar hidden">
-       <span>Administrador: Alexandre</span>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;">
-         <button id="btn-ir-formulario-bar" class="btn-admin" title="Formulário">Formulário</button>
-         <button id="btn-ir-pesquisa-bar" class="btn-admin" title="Pesquisar">Pesquisar</button>
-         <button id="btn-aprovacoes" class="btn-admin" title="Aprovar Usuários">Aprovações</button>
-         <button id="btn-limpar-historico" class="btn-admin" title="Limpar Histórico" style="background:#d32f2f;">Limpar Histórico</button>
-         <button id="btn-sair-admin-bar" class="btn-admin" style="background:#bdbdbd;color:#222;">Sair</button>
-       </div>
-     </div>
+<!-- Bloco admin-bar só aparece para admin -->
+<div id="admin-bar" class="admin-bar hidden">
+  <span>Administrador: Alexandre</span>
+  <div style="display:flex;flex-direction:column;gap:10px;flex-wrap:wrap;align-items:flex-start;">
+    <button id="btn-ir-formulario-bar" class="btn-admin" title="Formulário">Formulário</button>
+    <button id="btn-ir-pesquisa-bar" class="btn-admin" title="Pesquisar">Pesquisar</button>
+    <button id="btn-aprovacoes" class="btn-admin hidden" title="Aprovar Usuários">Aprovações</button>
+    <button id="btn-limpar-historico" class="btn-admin hidden" title="Limpar Histórico" style="background:#d32f2f;">Limpar Histórico</button>
+    <button id="btn-sair-admin-bar" class="btn-admin" style="background:#bdbdbd;color:#222;">Sair</button>
+  </div>
+</div>
      <!-- Tela de pesquisa -->
      <div id="tela-pesquisa" style="display:none;">
        <h3>Pesquisar Atendimentos</h3>
@@ -402,20 +413,22 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
      </div>
      <!-- Fim tela de pesquisa -->
      <!-- Tela de login/cadastro -->
-     <div id="tela-login">
-       <h3>Login</h3>
-       <label for="login-user">Inspetor de Qualidade</label>
-       <input type="text" id="login-user" required autocomplete="username">
-       <label for="login-pass">Senha</label>
-       <input type="password" id="login-pass" required autocomplete="current-password">
-       <button id="btn-login" class="btn">Entrar</button>
-       <div style="text-align:center;margin:10px 0;">
-         ou
-         <button id="btn-recuperar-senha" class="btn" style="background:#ffd600;color:#222;margin-top:8px;">Esqueci minha senha</button>
-       </div>
-       <button id="btn-mostrar-cadastro" class="btn" style="background:#bdbdbd;color:#222;">Cadastrar Novo Usuário</button>
+     <div id="tela-login" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;">
+      <h3 style="text-align:center;font-size:1.5rem;margin-bottom:24px;">Login</h3>
+      <form id="form-login" style="display:flex;flex-direction:column;gap:0;align-items:center;max-width:350px;width:100%;margin:0 auto;" autocomplete="off">
+        <label for="login-user" style="align-self:flex-start;margin-bottom:4px;">Inspetor de Qualidade</label>
+        <input type="text" id="login-user" required autocomplete="username" class="input-login" style="width:100%;">
+        <label for="login-pass" style="align-self:flex-start;margin-bottom:4px;">Senha</label>
+        <input type="password" id="login-pass" required autocomplete="current-password" class="input-login" style="width:100%;">
+        <button id="btn-login" class="btn" type="submit" style="width:100%;">Entrar</button>
+        <div style="text-align:center;margin:10px 0 0 0;width:100%;">
+          <span style="display:block;margin-bottom:8px;color:#888;font-size:0.98rem;">ou</span>
+          <button id="btn-recuperar-senha" class="btn" type="button" style="background:#ffd600;color:#222;margin:0 0 10px 0;width:100%;">Esqueci minha senha</button>
+        </div>
+        <button id="btn-mostrar-cadastro" class="btn" type="button" style="background:#bdbdbd;color:#222;margin:0;width:100%;">Cadastrar Novo Usuário</button>
+      </form>
      </div>
-     <div id="tela-cadastro" class="hidden">
+     <div id="tela-cadastro" class="hidden" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;">
        <h3>Cadastro de Novo Usuário</h3>
        <label for="cad-nome">Nome</label>
        <input type="text" id="cad-nome" required>
@@ -427,12 +440,12 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
        <button id="btn-voltar-login" class="btn" style="background:#bdbdbd;color:#222;">Voltar ao Login</button>
        <div id="cadastro-msg" style="margin-top:10px;color:#d32f2f;"></div>
      </div>
-     <div id="tela-aguarde" class="hidden card">
+     <div id="tela-aguarde" class="hidden card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;">
        Seu cadastro está aguardando aprovação do administrador.<br><br>
        <button id="btn-voltar-aguarde" class="btn" style="background:#bdbdbd;color:#222;max-width:200px;margin:0 auto;display:block;">Voltar ao Login</button>
        <div id="aguarde-timer" style="text-align:center;font-size:0.98rem;color:#888;margin-top:8px;"></div>
      </div>
-  <form id="formulario" class="hidden">
+  <form id="formulario" class="hidden" style="display:flex;flex-direction:column;align-items:center;justify-content:center;max-width:400px;margin:0 auto;gap:0;">
       <label for="local">Local de Atendimento</label>
       <select id="local" required>
         <option value="">Selecione...</option>
@@ -455,12 +468,14 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
       <textarea id="problema" required placeholder="Descreva o problema..."></textarea>
       <label for="aqpc">Ação da Qualidade</label>
       <textarea id="aqpc" placeholder="Descreva a ação da qualidade..." required></textarea>
-      <button type="submit" class="btn">Finalizar Atendimento</button>
+    <div style="display:flex;flex-direction:column;gap:10px;width:100%;align-items:center;margin-top:8px;">
+    <button type="submit" class="btn" style="width:100%;max-width:350px;">Finalizar Atendimento</button>
+    <button id="btn-pesquisar" class="btn hidden" style="width:100%;max-width:350px;">Pesquisar Atendimentos</button>
+  </div>
     </form>
-  <div id="resultado" class="card hidden"></div>
-    <button id="btn-pesquisar" class="btn hidden" style="margin-top:18px;">Pesquisar Atendimentos</button>
+  <div id="resultado" class="card hidden" style="max-width:400px;margin:0 auto;"></div>
     <!-- Tela de aprovação para admin -->
-  <div id="tela-admin" class="hidden card">
+  <div id="tela-admin" class="hidden card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;max-width:700px;margin:40px auto 0 auto;">
       <h3 style="color:var(--primary);text-align:center;margin-bottom:18px;">Solicitações de Cadastro</h3>
       <div id="lista-solicitacoes"></div>
       <h3 style="color:var(--primary);text-align:center;margin:24px 0 12px 0;">Usuários Cadastrados</h3>
@@ -473,7 +488,7 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
   <!-- Funções de usuários para admin serão inseridas no <script> -->
     </div>
   </div>
-  <div id="tela-recuperar-senha" class="hidden card">
+  <div id="tela-recuperar-senha" class="hidden card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;max-width:400px;margin:0 auto;">
        <h3>Recuperar/Criar Nova Senha</h3>
        <label for="recupera-nome">Nome</label>
        <input type="text" id="recupera-nome" required>
@@ -538,25 +553,21 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
       const snap = await ref.get();
       let atendimentos = snap.docs.map(doc => doc.data());
       if (usuarioFiltro) atendimentos = atendimentos.filter(a => a.usuario === usuarioFiltro);
-      // Agrupar por usuário e turno
       const usuarios = {};
       let totalAtend = 0;
       let totalMinutos = 0;
-      // Agrupar atendimentos por usuário e ordenar por hora
       const atendPorUsuario = {};
       atendimentos.forEach(a => {
         const user = a.usuario || 'Desconhecido';
         if (!atendPorUsuario[user]) atendPorUsuario[user] = [];
         atendPorUsuario[user].push(a);
       });
-      // Para cada usuário, somar apenas o tempo gasto em cada atendimento (campo 'tempo' em minutos)
       Object.entries(atendPorUsuario).forEach(([user, lista]) => {
         let minUser = 0;
         const turnos = {};
         lista.forEach((a) => {
           let min = 0;
           if (a.tempo) {
-            // Se vier como string tipo '1h 30min' ou '90', converter
             if (typeof a.tempo === 'string') {
               const match = a.tempo.match(/(\d+)h\s*(\d+)?/);
               if (match) {
@@ -564,15 +575,15 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
               } else if (!isNaN(Number(a.tempo))) {
                 min = Number(a.tempo);
               } else {
-                // Tenta pegar só minutos
                 const minMatch = a.tempo.match(/(\d+)\s*min/);
                 if (minMatch) min = parseInt(minMatch[1],10);
               }
             } else if (typeof a.tempo === 'number') {
               min = a.tempo;
             }
+          } else if (a.horaAtendimento && a.horaFinal) {
+            min = diffMinutos(a.horaAtendimento, a.horaFinal);
           }
-          // Só soma se houver valor válido em tempo
           if (min && min > 0) {
             minUser += min;
             const turno = getTurno(a.horaAtendimento);
@@ -733,7 +744,9 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
     }
 
     // Login
-    btnLogin.onclick = async function() {
+    // Login via submit do form-login
+    document.getElementById('form-login').addEventListener('submit', async function(e) {
+      e.preventDefault();
       const user = document.getElementById('login-user').value.trim();
       const pass = document.getElementById('login-pass').value.trim();
       if (!user || !pass) {
@@ -761,7 +774,7 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
       } else {
         mostrarTelaAtendimento();
       }
-    };
+    });
 
     btnMostrarCadastro.onclick = function() {
       telaLogin.classList.add('hidden');
@@ -828,6 +841,7 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
 
     btnVoltarAguarde.onclick = voltarParaLogin;
 
+    // Sempre esconde admin-bar para usuário comum
     function mostrarTelaAtendimento() {
       telaLogin.classList.add('hidden');
       telaCadastro.classList.add('hidden');
@@ -840,12 +854,24 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
       form.reset();
       if (usuarioLogado && usuarioLogado.admin) {
         adminBar.classList.remove('hidden');
+        document.getElementById('btn-aprovacoes').classList.remove('hidden');
+        document.getElementById('btn-limpar-historico').classList.remove('hidden');
       } else {
         adminBar.classList.add('hidden');
+        telaAdmin.classList.add('hidden');
+        document.getElementById('btn-aprovacoes').classList.add('hidden');
+        document.getElementById('btn-limpar-historico').classList.add('hidden');
       }
       form.style.display = 'block';
     }
+    // Garante que admin-bar e telaAdmin nunca aparecem para usuário comum
     function mostrarTelaAdmin() {
+      if (!(usuarioLogado && usuarioLogado.admin)) {
+        telaAdmin.classList.add('hidden');
+        adminBar.classList.add('hidden');
+        mostrarTelaAtendimento();
+        return;
+      }
       telaLogin.classList.add('hidden');
       telaCadastro.classList.add('hidden');
       telaAguarde.classList.add('hidden');
@@ -855,6 +881,8 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
       resultado.classList.add('hidden');
       telaAdmin.classList.remove('hidden');
       adminBar.classList.remove('hidden');
+      document.getElementById('btn-aprovacoes').classList.remove('hidden');
+      document.getElementById('btn-limpar-historico').classList.remove('hidden');
       carregarSolicitacoes();
       carregarUsuarios();
     }
@@ -918,6 +946,10 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
     // Botão Limpar Histórico (apenas admin)
     const btnLimparHistorico = document.getElementById('btn-limpar-historico');
     if (btnLimparHistorico) {
+      btnLimparHistorico.classList.add('hidden');
+      if (usuarioLogado && usuarioLogado.admin) {
+        btnLimparHistorico.classList.remove('hidden');
+      }
       btnLimparHistorico.onclick = async function() {
         const senha = prompt('Digite a senha de confirmação para limpar o histórico:');
         if (senha !== 'adga1204') {
@@ -928,7 +960,6 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
         try {
           await limparHistoricoAtendimentos();
           alert('Histórico de atendimentos apagado com sucesso!');
-          // Atualiza a tela de pesquisa se estiver aberta
           if (telaPesquisa && telaPesquisa.style.display === 'block') {
             mostrarResultados([]);
           }
@@ -998,6 +1029,28 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
         alert('Preencha todos os campos!');
         return;
       }
+      // Captura hora final do atendimento
+      const agora = new Date();
+      const horaFinal = agora.toTimeString().slice(0,5);
+      // Calcula tempo gasto
+      function diffMinutos(hora1, hora2) {
+        if (!hora1 || !hora2) return 0;
+        const [h1, m1] = hora1.split(":").map(Number);
+        const [h2, m2] = hora2.split(":").map(Number);
+        let t1 = h1 * 60 + m1;
+        let t2 = h2 * 60 + m2;
+        if (t2 < t1) t2 += 24 * 60;
+        return t2 - t1;
+      }
+      const minutos = diffMinutos(horaAtendimento, horaFinal);
+      let tempo = '';
+      if (minutos > 0) {
+        const h = Math.floor(minutos / 60);
+        const m = minutos % 60;
+        tempo = h > 0 ? `${h}h${m > 0 ? ' ' + m + 'min' : ''}` : `${m}min`;
+      } else {
+        tempo = '0min';
+      }
       // Salva atendimento
       const atendimento = {
         data: dataAtendimento,
@@ -1006,6 +1059,8 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
         nomePeca,
         numeroPeca,
         horaAtendimento,
+        horaFinal,
+        tempo,
         problema,
         acao,
         usuario: usuarioLogado ? usuarioLogado.usuario : ''
@@ -1015,10 +1070,20 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
       telaPesquisa.style.display = 'block';
       form.classList.add('hidden');
       btnPesquisar.classList.remove('hidden');
-      adminBar.classList.remove('hidden');
+      if (!(usuarioLogado && usuarioLogado.admin)) {
+        adminBar.classList.add('hidden');
+        document.getElementById('btn-ir-formulario-bar').classList.add('hidden');
+        document.getElementById('btn-ir-pesquisa-bar').classList.add('hidden');
+        document.getElementById('btn-sair-admin-bar').classList.add('hidden');
+      } else {
+        adminBar.classList.remove('hidden');
+        document.getElementById('btn-ir-formulario-bar').classList.remove('hidden');
+        document.getElementById('btn-ir-pesquisa-bar').classList.remove('hidden');
+        document.getElementById('btn-sair-admin-bar').classList.remove('hidden');
+      }
       telaAdmin.classList.add('hidden');
       resultado.classList.add('hidden');
-      // Mostra o atendimento recém cadastrado no topo
+      // Mostra o atendimento recém cadastrado no topo, já com tempo gasto
       mostrarResultados([atendimento]);
     });
 
@@ -1031,56 +1096,55 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
       mostrarResultados(lista);
     };
 
-
-    // Função sairApp: sempre retorna para login e esconde todas as telas
-    function sairApp() {
-      usuarioLogado = null;
-      telaLogin.classList.remove('hidden');
-      telaCadastro.classList.add('hidden');
-      telaAguarde.classList.add('hidden');
-      form.classList.add('hidden');
-      btnPesquisar.classList.add('hidden');
-      telaAdmin.classList.add('hidden');
-      telaPesquisa.style.display = 'none';
-      resultado.classList.add('hidden');
-      adminBar.classList.add('hidden');
-    }
-
-    // Botão sair em todas as telas (menos login)
-  // document.getElementById('btn-sair-form').onclick = sairApp;
-    document.getElementById('btn-sair-admin').onclick = sairApp;
-    if (btnVoltarLoginPesquisa) btnVoltarLoginPesquisa.onclick = sairApp;
-    if (btnSairAppAdmin) btnSairAppAdmin.onclick = sairApp;
-
-    // Filtrar atendimentos
-    btnFiltrar.onclick = async function() {
-      const data = document.getElementById('filtro-data').value;
-      const depto = document.getElementById('filtro-depto').value;
-      const lista = await buscarAtendimentos(data, depto);
-      mostrarResultados(lista);
-    };
-
     function mostrarResultados(lista) {
       if (!lista.length) {
         resultadosPesquisa.innerHTML = '<em>Nenhum atendimento encontrado.</em>';
         return;
       }
       resultadosPesquisa.innerHTML = lista.map((a, idx) => {
-        // Só mostra botão de deletar para admin
         let btnDelete = '';
+        let btnEditar = '';
         if (usuarioLogado && usuarioLogado.admin) {
           btnDelete = `<button class="btn-excluir-atendimento" data-idx="${idx}" style="background:#e57373;color:#fff;border:none;border-radius:6px;padding:7px 14px;cursor:pointer;margin-top:8px;">Excluir</button>`;
+        }
+        // Botão editar para o próprio usuário
+        if (usuarioLogado && a.usuario === usuarioLogado.usuario) {
+          btnEditar = `<button class="btn-editar-atendimento" data-idx="${idx}" style="background:#ffd600;color:#222;border:none;border-radius:6px;padding:7px 14px;cursor:pointer;margin-top:8px;margin-left:8px;">Atualizar</button>`;
+        }
+        // Calcular tempo gasto
+        let tempo = a.tempo;
+        if ((!tempo || tempo === 'Indefinido') && a.horaAtendimento && a.horaFinal) {
+          const [h1, m1] = a.horaAtendimento.split(":").map(Number);
+          const [h2, m2] = a.horaFinal.split(":").map(Number);
+          let t1 = h1 * 60 + m1;
+          let t2 = h2 * 60 + m2;
+          if (t2 < t1) t2 += 24 * 60;
+          const min = t2 - t1;
+          const h = Math.floor(min / 60);
+          const m = min % 60;
+          tempo = h > 0 ? `${h}h${m > 0 ? ' ' + m + 'min' : ''}` : `${m}min`;
+        } else if (!tempo || tempo === 'Indefinido') {
+          tempo = '0min';
+        }
+        // Mostra responsável pelo atendimento
+        const responsavel = a.pessoa || a.usuario || '';
+        // Mostra revisão
+        let revisadoInfo = '';
+        if (a.revisadoPor) {
+          revisadoInfo = `<br><b>Revisado por:</b> ${a.revisadoPor}`;
         }
         return `
         <div class="atendimento-item" style="border:1px solid #ccc;border-radius:8px;padding:10px;margin-bottom:10px;">
           <b>Data:</b> ${a.data}<br>
           <b>Departamento:</b> ${a.local}<br>
           <b>Data do Atendimento:</b> ${a.data}<br>
+          <b>Responsável:</b> ${responsavel}<br>
           <b>Descrição do Problema:</b> ${a.problema}<br>
           <b>Ação Tomada:</b> ${a.acao}<br>
-          <b>Tempo:</b> ${a.tempo}<br>
-          <b>Usuário:</b> ${a.usuario || ''}<br>
+          <b>Tempo:</b> ${tempo}<br>
+          ${revisadoInfo}
           ${(usuarioLogado && usuarioLogado.admin) ? btnDelete : ''}
+          ${btnEditar}
         </div>
         `;
       }).join('');
@@ -1097,7 +1161,6 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
             }
             if (!confirm('Tem certeza que deseja excluir este atendimento?')) return;
             // Excluir do Firestore
-            // Busca pelo atendimento exato (data, usuario, horaAtendimento, problema, acao, etc)
             const snap = await db.collection('atendimentos')
               .where('data', '==', atendimento.data)
               .where('usuario', '==', atendimento.usuario)
@@ -1108,7 +1171,6 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
             if (!snap.empty) {
               await db.collection('atendimentos').doc(snap.docs[0].id).delete();
               alert('Atendimento excluído com sucesso!');
-              // Atualiza a lista
               const novaLista = await buscarAtendimentos(
                 document.getElementById('filtro-data').value,
                 document.getElementById('filtro-depto').value
@@ -1120,8 +1182,75 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
           };
         });
       }
+      // Adiciona eventos aos botões de editar
+      document.querySelectorAll('.btn-editar-atendimento').forEach(btn => {
+        btn.onclick = async function() {
+          const idx = this.getAttribute('data-idx');
+          const atendimento = lista[idx];
+          const senha = prompt('Digite sua senha para atualizar este atendimento:');
+          // Busca usuário logado para validar senha
+          const snap = await db.collection('usuarios')
+            .where('usuario', '==', usuarioLogado.usuario)
+            .where('senha', '==', senha)
+            .get();
+          if (snap.empty) {
+            alert('Senha incorreta. Atualização cancelada.');
+            return;
+          }
+          // Permite editar apenas os campos de problema e ação
+          const novoProblema = prompt('Atualize a descrição do problema:', atendimento.problema);
+          if (novoProblema === null) return;
+          const novaAcao = prompt('Atualize a ação tomada:', atendimento.acao);
+          if (novaAcao === null) return;
+          // Atualiza no Firestore
+          const snapAt = await db.collection('atendimentos')
+            .where('data', '==', atendimento.data)
+            .where('usuario', '==', atendimento.usuario)
+            .where('horaAtendimento', '==', atendimento.horaAtendimento)
+            .where('problema', '==', atendimento.problema)
+            .where('acao', '==', atendimento.acao)
+            .get();
+          if (!snapAt.empty) {
+            await db.collection('atendimentos').doc(snapAt.docs[0].id).update({
+              problema: novoProblema,
+              acao: novaAcao,
+              revisadoPor: usuarioLogado.usuario
+            });
+            alert('Atendimento atualizado e revisado!');
+            // Atualiza a lista
+            const novaLista = await buscarAtendimentos(
+              document.getElementById('filtro-data').value,
+              document.getElementById('filtro-depto').value
+            );
+            mostrarResultados(novaLista);
+          } else {
+            alert('Não foi possível encontrar o atendimento para atualização.');
+          }
+        };
+      });
     }
 
+    // Função sairApp: sempre retorna para login e esconde todas as telas
+function sairApp() {
+  usuarioLogado = null;
+  telaLogin.classList.remove('hidden');
+  telaCadastro.classList.add('hidden');
+  telaAguarde.classList.add('hidden');
+  form.classList.add('hidden');
+  btnPesquisar.classList.add('hidden');
+  telaAdmin.classList.add('hidden');
+  telaPesquisa.style.display = 'none';
+  resultado.classList.add('hidden');
+  adminBar.classList.add('hidden');
+  if (typeof telaRecuperarSenha !== 'undefined') telaRecuperarSenha.classList.add('hidden');
+}
+
+// Padroniza todos os botões de sair para usar sairApp
+if (document.getElementById('btn-sair-admin')) document.getElementById('btn-sair-admin').onclick = sairApp;
+if (btnSairAdminBar) btnSairAdminBar.onclick = sairApp;
+if (btnVoltarLoginPesquisa) btnVoltarLoginPesquisa.onclick = sairApp;
+if (btnSairAppAdmin) btnSairAppAdmin.onclick = sairApp;
+// Se houver outros botões de sair, adicione aqui
     // Inicialização: mostrar tela de login
     window.onload = function() {
       // Só mostra tela de login após splash
@@ -1134,7 +1263,12 @@ Você pode personalizar ainda mais as cores no bloco <style> acima.
         telaAdmin.classList.add('hidden');
         telaPesquisa.style.display = 'none';
         adminBar.classList.add('hidden');
-        document.getElementById('btn-sair-form').style.display = 'block';
+        document.getElementById('btn-aprovacoes').classList.add('hidden');
+        document.getElementById('btn-limpar-historico').classList.add('hidden');
+        if (!(usuarioLogado && usuarioLogado.admin)) {
+          adminBar.classList.add('hidden');
+          telaAdmin.classList.add('hidden');
+        }
       }, 7000);
     };
     if (btnRecuperarSenha) btnRecuperarSenha.onclick = function() {
